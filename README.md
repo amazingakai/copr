@@ -2,6 +2,7 @@
 
 [![Fedora COPR](https://img.shields.io/badge/Fedora%20COPR-amazingakai%2Fcopr-294172?logo=fedora&logoColor=white)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/)
 [![Supported Fedora](https://img.shields.io/badge/Fedora-43%20%7C%2044%20%7C%2045-blue?logo=fedora&logoColor=white)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/)
+[![Architectures](https://img.shields.io/badge/Arch-x86__64%20%7C%20aarch64-blue)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/)
 [![Build and Dispatch to Fedora COPR](https://github.com/amazingakai/copr/actions/workflows/copr-build.yml/badge.svg)](https://github.com/amazingakai/copr/actions/workflows/copr-build.yml)
 [![Upstream Version Checker](https://github.com/amazingakai/copr/actions/workflows/version-check.yml/badge.svg)](https://github.com/amazingakai/copr/actions/workflows/version-check.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)

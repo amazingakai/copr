@@ -105,7 +105,8 @@ def check_all_from_releases(
         latest = ag_items[0]
         latest_hub_ver = str(latest["version"])
         latest_hub_build = str(latest["execution_id"])
-        hub_url = f"https://storage.googleapis.com/antigravity-public/antigravity-hub/{latest_hub_ver}-{latest_hub_build}/linux-x64/Antigravity.tar.gz"
+        hub_url_x64 = f"https://storage.googleapis.com/antigravity-public/antigravity-hub/{latest_hub_ver}-{latest_hub_build}/linux-x64/Antigravity.tar.gz"
+        hub_url_arm = f"https://storage.googleapis.com/antigravity-public/antigravity-hub/{latest_hub_ver}-{latest_hub_build}/linux-arm/Antigravity.tar.gz"
 
         print(
             f"[antigravity] Upstream: {latest_hub_ver}-{latest_hub_build} | Spec: {cur_ver_hub}-{cur_build_hub}"
@@ -114,7 +115,8 @@ def check_all_from_releases(
             print(
                 "  └─ Source: https://antigravity.google/releases (data-fallback-antigravity)"
             )
-            print(f"  └─ Download URL: {hub_url}")
+            print(f"  └─ Download x64: {hub_url_x64}")
+            print(f"  └─ Download arm64: {hub_url_arm}")
 
         if (version_tuple(latest_hub_ver) > version_tuple(cur_ver_hub)) or (
             latest_hub_ver == cur_ver_hub
@@ -127,7 +129,7 @@ def check_all_from_releases(
                 "current_version": cur_ver_hub,
                 "latest_version": latest_hub_ver,
                 "build_id": latest_hub_build,
-                "url": hub_url,
+                "url": f"x86_64: {hub_url_x64}\n- aarch64: {hub_url_arm}",
             }
     else:
         print(
@@ -146,7 +148,8 @@ def check_all_from_releases(
         latest = ide_items[0]
         latest_ide_ver = str(latest["version"])
         latest_ide_build = str(latest["execution_id"])
-        ide_url = f"https://edgedl.me.gvt1.com/edgedl/release2/j0qc3/antigravity/stable/{latest_ide_ver}-{latest_ide_build}/linux-x64/Antigravity%20IDE.tar.gz"
+        ide_url_x64 = f"https://edgedl.me.gvt1.com/edgedl/release2/j0qc3/antigravity/stable/{latest_ide_ver}-{latest_ide_build}/linux-x64/Antigravity%20IDE.tar.gz"
+        ide_url_arm = f"https://edgedl.me.gvt1.com/edgedl/release2/j0qc3/antigravity/stable/{latest_ide_ver}-{latest_ide_build}/linux-arm/Antigravity%20IDE.tar.gz"
 
         print(
             f"[antigravity-ide] Upstream: {latest_ide_ver}-{latest_ide_build} | Spec: {cur_ver_ide}-{cur_build_ide}"
@@ -155,7 +158,8 @@ def check_all_from_releases(
             print(
                 "  └─ Source: https://antigravity.google/releases (data-fallback-ide)"
             )
-            print(f"  └─ Download URL: {ide_url}")
+            print(f"  └─ Download x64: {ide_url_x64}")
+            print(f"  └─ Download arm64: {ide_url_arm}")
 
         if (version_tuple(latest_ide_ver) > version_tuple(cur_ver_ide)) or (
             latest_ide_ver == cur_ver_ide
@@ -168,7 +172,7 @@ def check_all_from_releases(
                 "current_version": cur_ver_ide,
                 "latest_version": latest_ide_ver,
                 "build_id": latest_ide_build,
-                "url": ide_url,
+                "url": f"x86_64: {ide_url_x64}\n- aarch64: {ide_url_arm}",
             }
     else:
         print(
@@ -206,11 +210,13 @@ def check_all_from_releases(
         pass
 
     if candidate_cli_ver:
-        cli_url = f"https://github.com/google-antigravity/antigravity-cli/releases/download/{candidate_cli_ver}/agy_cli_linux_x64.tar.gz"
+        cli_url_x64 = f"https://github.com/google-antigravity/antigravity-cli/releases/download/{candidate_cli_ver}/agy_cli_linux_x64.tar.gz"
+        cli_url_arm = f"https://github.com/google-antigravity/antigravity-cli/releases/download/{candidate_cli_ver}/agy_cli_linux_arm64.tar.gz"
         print(f"[antigravity-cli] Upstream: {candidate_cli_ver} | Spec: {cur_ver_cli}")
         if verbose:
             print(f"  └─ Source: {cli_source}")
-            print(f"  └─ Download URL: {cli_url}")
+            print(f"  └─ Download x64: {cli_url_x64}")
+            print(f"  └─ Download arm64: {cli_url_arm}")
 
         if version_tuple(candidate_cli_ver) > version_tuple(cur_ver_cli):
             results["antigravity-cli"] = {
@@ -219,7 +225,7 @@ def check_all_from_releases(
                 "current_version": cur_ver_cli,
                 "latest_version": candidate_cli_ver,
                 "build_id": None,
-                "url": cli_url,
+                "url": f"x86_64: {cli_url_x64}\n- aarch64: {cli_url_arm}",
             }
     else:
         print(

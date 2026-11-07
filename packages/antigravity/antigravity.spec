@@ -1,18 +1,19 @@
 Name:           antigravity
 Version:        2.29.0
 %global build_id 5723181030440960
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Google Antigravity Desktop Client
 
 License:        LicenseRef-Google-Antigravity
 URL:            https://antigravity.google
-Source0:        https://storage.googleapis.com/antigravity-public/antigravity-hub/%{version}-%{build_id}/linux-x64/Antigravity.tar.gz
-Source1:        antigravity.sh
-Source2:        antigravity.desktop
-Source3:        patch-kdecoration.py
-Source4:        antigravity.appdata.xml
+Source0:        https://storage.googleapis.com/antigravity-public/antigravity-hub/%{version}-%{build_id}/linux-x64/Antigravity.tar.gz#/Antigravity-x64-%{version}.tar.gz
+Source1:        https://storage.googleapis.com/antigravity-public/antigravity-hub/%{version}-%{build_id}/linux-arm/Antigravity.tar.gz#/Antigravity-arm64-%{version}.tar.gz
+Source2:        antigravity.sh
+Source3:        antigravity.desktop
+Source4:        patch-kdecoration.py
+Source5:        antigravity.appdata.xml
 
-ExclusiveArch:  x86_64
+ExclusiveArch:  x86_64 aarch64
 
 BuildRequires:  python3
 BuildRequires:  desktop-file-utils
@@ -37,10 +38,14 @@ window decorations and Wayland support.
 
 %prep
 %setup -q -c -T -n antigravity-%{version}
+%ifarch x86_64
 tar -xzf %{SOURCE0} --strip-components=1
+%elifarch aarch64
+tar -xzf %{SOURCE1} --strip-components=1
+%endif
 
 # Patch app.asar to fix titleBarOverlay collision in KDE Plasma 6
-python3 %{SOURCE3} resources/app.asar
+python3 %{SOURCE4} resources/app.asar
 
 # Remove in-app updater configuration so DNF manages application lifecycle
 rm -f resources/app-update.yml
@@ -61,15 +66,15 @@ chmod 4755 %{buildroot}/opt/antigravity/chrome-sandbox 2>/dev/null || true
 
 # Install launcher wrapper
 mkdir -p %{buildroot}%{_bindir}
-install -m 755 %{SOURCE1} %{buildroot}%{_bindir}/antigravity
+install -m 755 %{SOURCE2} %{buildroot}%{_bindir}/antigravity
 
 # Install desktop entry
 mkdir -p %{buildroot}%{_datadir}/applications
-desktop-file-install --dir=%{buildroot}%{_datadir}/applications %{SOURCE2}
+desktop-file-install --dir=%{buildroot}%{_datadir}/applications %{SOURCE3}
 
 # Install AppStream metadata
 mkdir -p %{buildroot}%{_datadir}/metainfo
-install -m 644 %{SOURCE4} %{buildroot}%{_datadir}/metainfo/antigravity.appdata.xml
+install -m 644 %{SOURCE5} %{buildroot}%{_datadir}/metainfo/antigravity.appdata.xml
 
 # Extract high-resolution application icon from app.asar
 mkdir -p %{buildroot}%{_datadir}/pixmaps
@@ -101,6 +106,9 @@ appstream-util validate-relax --nonet %{buildroot}%{_datadir}/metainfo/antigravi
 %{_datadir}/icons/hicolor/512x512/apps/antigravity.png
 
 %changelog
+* Sat Nov 07 2026 Azhar Momin <azhar-momin@outlook.com> - 2.29.0-2
+- Add support for aarch64 (ARM64) architecture
+
 * Sat Nov 07 2026 Azhar Momin <azhar-momin@outlook.com> - 2.29.0-1
 - Initial Fedora RPM packaging for Antigravity Desktop 2.29.0
 - Add in-place patch for KDE Plasma 6 left-hand window button decoration fix

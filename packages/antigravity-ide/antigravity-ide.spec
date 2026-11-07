@@ -1,17 +1,18 @@
 Name:           antigravity-ide
 Version:        2.6.0
 %global build_id 5526304964083712
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Google Antigravity Standalone IDE
 
 License:        LicenseRef-Google-Antigravity
 URL:            https://antigravity.google
-Source0:        https://edgedl.me.gvt1.com/edgedl/release2/j0qc3/antigravity/stable/%{version}-%{build_id}/linux-x64/Antigravity%%20IDE.tar.gz#/Antigravity-IDE-%{version}.tar.gz
-Source1:        antigravity-ide.sh
-Source2:        antigravity-ide.desktop
-Source3:        antigravity-ide.appdata.xml
+Source0:        https://edgedl.me.gvt1.com/edgedl/release2/j0qc3/antigravity/stable/%{version}-%{build_id}/linux-x64/Antigravity%%20IDE.tar.gz#/Antigravity-IDE-x64-%{version}.tar.gz
+Source1:        https://edgedl.me.gvt1.com/edgedl/release2/j0qc3/antigravity/stable/%{version}-%{build_id}/linux-arm/Antigravity%%20IDE.tar.gz#/Antigravity-IDE-arm64-%{version}.tar.gz
+Source2:        antigravity-ide.sh
+Source3:        antigravity-ide.desktop
+Source4:        antigravity-ide.appdata.xml
 
-ExclusiveArch:  x86_64
+ExclusiveArch:  x86_64 aarch64
 
 BuildRequires:  desktop-file-utils
 BuildRequires:  libappstream-glib
@@ -36,7 +37,11 @@ directly into your coding environment.
 
 %prep
 %setup -q -c -T -n antigravity-ide-%{version}
+%ifarch x86_64
 tar -xzf %{SOURCE0} --strip-components=1
+%elifarch aarch64
+tar -xzf %{SOURCE1} --strip-components=1
+%endif
 
 %build
 # Pre-compiled binary release; no compilation needed
@@ -65,15 +70,15 @@ chmod 4755 %{buildroot}/opt/antigravity-ide/chrome-sandbox 2>/dev/null || true
 
 # Install launcher wrapper
 mkdir -p %{buildroot}%{_bindir}
-install -m 755 %{SOURCE1} %{buildroot}%{_bindir}/antigravity-ide
+install -m 755 %{SOURCE2} %{buildroot}%{_bindir}/antigravity-ide
 
 # Install desktop entry
 mkdir -p %{buildroot}%{_datadir}/applications
-desktop-file-install --dir=%{buildroot}%{_datadir}/applications %{SOURCE2}
+desktop-file-install --dir=%{buildroot}%{_datadir}/applications %{SOURCE3}
 
 # Install AppStream metadata
 mkdir -p %{buildroot}%{_datadir}/metainfo
-install -m 644 %{SOURCE3} %{buildroot}%{_datadir}/metainfo/antigravity-ide.appdata.xml
+install -m 644 %{SOURCE4} %{buildroot}%{_datadir}/metainfo/antigravity-ide.appdata.xml
 
 # Install application icons
 mkdir -p %{buildroot}%{_datadir}/pixmaps
@@ -104,6 +109,9 @@ appstream-util validate-relax --nonet %{buildroot}%{_datadir}/metainfo/antigravi
 %{_datadir}/zsh/site-functions/_antigravity-ide
 
 %changelog
+* Sat Nov 07 2026 Azhar Momin <azhar-momin@outlook.com> - 2.6.0-2
+- Add support for aarch64 (ARM64) architecture
+
 * Sat Nov 07 2026 Azhar Momin <azhar-momin@outlook.com> - 2.6.0-1
 - Initial Fedora RPM packaging for Antigravity IDE 2.6.0
 - Disable in-app auto-updater via product.json in favor of DNF repository management

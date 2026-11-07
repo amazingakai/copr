@@ -1,14 +1,15 @@
 Name:           antigravity-cli
 Version:        1.5.3
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Command-line interface for Google Antigravity
 
 License:        LicenseRef-Google-Antigravity
 URL:            https://antigravity.google
 Source0:        https://github.com/google-antigravity/antigravity-cli/releases/download/%{version}/agy_cli_linux_x64.tar.gz
-Source1:        agy.sh
+Source1:        https://github.com/google-antigravity/antigravity-cli/releases/download/%{version}/agy_cli_linux_arm64.tar.gz
+Source2:        agy.sh
 
-ExclusiveArch:  x86_64
+ExclusiveArch:  x86_64 aarch64
 
 Provides:       agy = %{version}-%{release}
 
@@ -21,7 +22,12 @@ The Antigravity CLI (agy) is a lightweight, terminal-based interface for fast
 agent interaction, running slash commands, headless prompts, and background tasks.
 
 %prep
-%setup -q -c -n antigravity-cli-%{version}
+%setup -q -c -T -n antigravity-cli-%{version}
+%ifarch x86_64
+tar -xzf %{SOURCE0}
+%elifarch aarch64
+tar -xzf %{SOURCE1}
+%endif
 
 %build
 # Pre-compiled standalone binary
@@ -41,7 +47,7 @@ fi
 
 # Install the launcher wrapper to /usr/bin/agy (disables self-updater)
 mkdir -p %{buildroot}%{_bindir}
-install -m 755 %{SOURCE1} %{buildroot}%{_bindir}/agy
+install -m 755 %{SOURCE2} %{buildroot}%{_bindir}/agy
 
 # Create convenient alias symlink
 ln -sf agy %{buildroot}%{_bindir}/antigravity-cli
@@ -55,6 +61,9 @@ ln -sf agy %{buildroot}%{_bindir}/antigravity-cli
 %{_libexecdir}/antigravity-cli/agy
 
 %changelog
+* Sat Nov 07 2026 Azhar Momin <azhar-momin@outlook.com> - 1.5.3-2
+- Add support for aarch64 (ARM64) architecture
+
 * Sat Nov 07 2026 Azhar Momin <azhar-momin@outlook.com> - 1.5.3-1
 - Initial Fedora RPM packaging for Antigravity CLI (agy) 1.5.3
 - Disable internal self-updater in favor of DNF repository management
