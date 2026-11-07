@@ -1,31 +1,50 @@
 # amazingakai/copr
 
+[![Fedora COPR](https://img.shields.io/badge/Fedora%20COPR-amazingakai%2Fcopr-294172?logo=fedora&logoColor=white)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/)
+[![Supported Fedora](https://img.shields.io/badge/Fedora-43%20%7C%2044%20%7C%2045-blue?logo=fedora&logoColor=white)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/)
+[![Build and Dispatch to Fedora COPR](https://github.com/amazingakai/copr/actions/workflows/copr-build.yml/badge.svg)](https://github.com/amazingakai/copr/actions/workflows/copr-build.yml)
+[![Upstream Version Checker](https://github.com/amazingakai/copr/actions/workflows/version-check.yml/badge.svg)](https://github.com/amazingakai/copr/actions/workflows/version-check.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 Personal Fedora COPR repository for custom, repackaged, and patched RPMs.
 
-COPR Project: [`amazingakai/copr`](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/)
+**COPR Project Page:** [copr.fedorainfracloud.org/coprs/amazingakai/copr](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/)
 
 ---
 
-## Installation
+## Quick Start
 
-Enable the COPR repository:
+### 1. Enable the COPR repository
 
 ```bash
 sudo dnf copr enable amazingakai/copr
 ```
 
-Install any package with `dnf`:
+### 2. Install packages
 
 ```bash
-sudo dnf install <package-name>
+# Antigravity Desktop Client
+sudo dnf install -y antigravity
+
+# Antigravity Standalone IDE
+sudo dnf install -y antigravity-ide
+
+# Antigravity CLI
+sudo dnf install -y antigravity-cli
 ```
 
 ---
 
 ## Available Packages
 
-| Package               | Command           | Description                               |
-| :-------------------- | :---------------- | :---------------------------------------- |
-| **`antigravity`**     | `antigravity`     | Google Antigravity Desktop Client         |
-| **`antigravity-ide`** | `antigravity-ide` | Google Antigravity Standalone IDE         |
-| **`antigravity-cli`** | `agy`             | Google Antigravity CLI terminal interface |
+| Package               | Command           | Build Status                                                                                                                                                                                                       | Description                               |
+| :-------------------- | :---------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :---------------------------------------- |
+| **`antigravity`**     | `antigravity`     | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/antigravity/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/antigravity/)         | Google Antigravity Desktop Client         |
+| **`antigravity-ide`** | `antigravity-ide` | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/antigravity-ide/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/antigravity-ide/) | Google Antigravity Standalone IDE         |
+| **`antigravity-cli`** | `agy`             | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/antigravity-cli/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/antigravity-cli/) | Google Antigravity CLI terminal interface |
+
+---
+
+## License
+
+This packaging repository and automation scripts are licensed under the [MIT License](LICENSE). Google Antigravity, Antigravity IDE, and `agy` binaries are subject to Google's terms of service and software licenses.
