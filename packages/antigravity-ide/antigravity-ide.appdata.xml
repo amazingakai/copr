@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>antigravity-ide.desktop</id>
+  <metadata_license>MIT</metadata_license>
+  <project_license>LicenseRef-Google-Antigravity</project_license>
+  <name>Google Antigravity IDE</name>
+  <summary>AI-first integrated development environment built on VS Code</summary>
+  <description>
+    <p>
+      Google Antigravity IDE is an AI-first integrated development environment built on
+      VS Code. It integrates advanced agentic coding, multi-file code synthesis,
+      context-aware completions, and terminal workflows directly into a familiar editor.
+    </p>
+    <p>
+      Key capabilities include autonomous coding subagents, deep project-wide indexing,
+      seamless terminal integration, and direct support for Gemini models.
+    </p>
+  </description>
+  <launchable type="desktop-id">antigravity-ide.desktop</launchable>
+  <url type="homepage">https://antigravity.google</url>
+  <developer id="com.google">
+    <name>Google</name>
+  </developer>
+  <categories>
+    <category>Development</category>
+    <category>IDE</category>
+    <category>TextEditor</category>
+  </categories>
+  <content_rating type="oars-1.1" />
+  <provides>
+    <binary>antigravity-ide</binary>
+  </provides>
+</component>

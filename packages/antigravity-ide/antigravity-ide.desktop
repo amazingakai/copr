@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=Google Antigravity IDE
+Comment=AI-first Integrated Development Environment built on VS Code
+Exec=/usr/bin/antigravity-ide %F
+Terminal=false
+Type=Application
+Icon=antigravity-ide
+StartupWMClass=Google Antigravity IDE
+Categories=Development;IDE;
+MimeType=text/plain;inode/directory;x-scheme-handler/antigravity-ide;
+Keywords=google;antigravity;ide;vscode;editor;ai;

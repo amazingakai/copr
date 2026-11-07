@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=Google Antigravity
+Comment=Google Antigravity Desktop Client
+Exec=/usr/bin/antigravity %U
+Terminal=false
+Type=Application
+Icon=antigravity
+StartupWMClass=Google Antigravity
+Categories=Development;IDE;
+MimeType=x-scheme-handler/antigravity;
+Keywords=google;antigravity;agent;ai;ide;

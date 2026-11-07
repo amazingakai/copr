@@ -1,0 +1,149 @@
+name: Build and Dispatch to Fedora COPR
+
+on:
+  push:
+    branches:
+      - master
+      - main
+    paths:
+      - 'packages/**'
+  pull_request:
+    branches:
+      - master
+      - main
+    paths:
+      - 'packages/**'
+  workflow_dispatch:
+    inputs:
+      package:
+        description: 'Package to build'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - antigravity
+          - antigravity-ide
+          - antigravity-cli
+
+jobs:
+  determine-packages:
+    runs-on: ubuntu-latest
+    outputs:
+      packages: ${{ steps.set-matrix.outputs.packages }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          fetch-depth: 2
+
+      - name: Determine changed packages
+        id: set-matrix
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            if [ "${{ inputs.package }}" = "all" ]; then
+              echo 'packages=["antigravity", "antigravity-ide", "antigravity-cli"]' >> "$GITHUB_OUTPUT"
+            else
+              echo "packages=[\"${{ inputs.package }}\"]" >> "$GITHUB_OUTPUT"
+            fi
+          elif [ "${{ github.event_name }}" = "pull_request" ]; then
+            CHANGED=$(git diff --name-only origin/${{ github.base_ref }} HEAD | grep -E '^packages/' | cut -d/ -f2 | sort -u || true)
+            JSON_ARRAY=$(echo "$CHANGED" | jq -R -s -c 'split("\n")[:-1]')
+            echo "packages=$JSON_ARRAY" >> "$GITHUB_OUTPUT"
+          else
+            CHANGED=$(git diff --name-only HEAD~1 HEAD | grep -E '^packages/' | cut -d/ -f2 | sort -u || true)
+            if [ -z "$CHANGED" ]; then
+              # Fallback: check all packages if HEAD~1 is not available (e.g. initial push)
+              CHANGED=$(ls packages)
+            fi
+            JSON_ARRAY=$(echo "$CHANGED" | jq -R -s -c 'split("\n")[:-1]')
+            echo "packages=$JSON_ARRAY" >> "$GITHUB_OUTPUT"
+          fi
+
+  build-and-submit:
+    needs: determine-packages
+    runs-on: ubuntu-latest
+    container:
+      image: fedora:latest
+    strategy:
+      fail-fast: false
+      matrix:
+        package: ${{ fromJson(needs.determine-packages.outputs.packages) }}
+    steps:
+      - name: Install build tools and copr-cli
+        run: |
+          dnf install -y --setopt=install_weak_deps=False \
+            rpm-build \
+            rpmdevtools \
+            spectool \
+            desktop-file-utils \
+            python3 \
+            jq \
+            copr-cli \
+            git
+
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Configure COPR credentials
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        env:
+          COPR_LOGIN: ${{ secrets.COPR_LOGIN }}
+          COPR_USERNAME: ${{ secrets.COPR_USERNAME }}
+          COPR_TOKEN: ${{ secrets.COPR_TOKEN }}
+          COPR_URL: ${{ secrets.COPR_URL }}
+        run: |
+          mkdir -p ~/.config
+          cat <<EOF > ~/.config/copr
+          [copr-cli]
+          login = ${COPR_LOGIN}
+          username = ${COPR_USERNAME}
+          token = ${COPR_TOKEN}
+          copr_url = ${COPR_URL:-https://copr.fedorainfracloud.org}
+          EOF
+          chmod 600 ~/.config/copr
+
+      - name: Prepare RPM build environment
+        run: |
+          rpmdev-setuptree
+          PKG="${{ matrix.package }}"
+          SPEC_FILE="packages/${PKG}/${PKG}.spec"
+
+          if [ ! -f "${SPEC_FILE}" ]; then
+            echo "Error: Spec file not found: ${SPEC_FILE}"
+            exit 1
+          fi
+
+          echo "Copying local sources to ~/rpmbuild/SOURCES/..."
+          cp -v packages/${PKG}/* ~/rpmbuild/SOURCES/ 2>/dev/null || true
+          cp -v "${SPEC_FILE}" ~/rpmbuild/SPECS/
+
+          echo "Downloading remote Source archives..."
+          spectool -g -C ~/rpmbuild/SOURCES/ ~/rpmbuild/SPECS/${PKG}.spec
+
+      - name: Test prep stage and verify patch applies cleanly
+        run: |
+          PKG="${{ matrix.package }}"
+          echo "Testing %prep stage for ${PKG}..."
+          rpmbuild -bp ~/rpmbuild/SPECS/${PKG}.spec
+
+      - name: Build Source RPM (SRPM)
+        run: |
+          PKG="${{ matrix.package }}"
+          rpmbuild -bs ~/rpmbuild/SPECS/${PKG}.spec
+
+      - name: Submit SRPM to Fedora COPR
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        env:
+          COPR_PROJECT: ${{ secrets.COPR_PROJECT }}
+        run: |
+          PKG="${{ matrix.package }}"
+          SRPM=$(find ~/rpmbuild/SRPMS -name "${PKG}-*.src.rpm" | head -n 1)
+
+          if [ -z "${SRPM}" ] || [ ! -f "${SRPM}" ]; then
+            echo "Error: SRPM not generated."
+            exit 1
+          fi
+
+          echo "Submitting ${SRPM} to COPR project: ${COPR_PROJECT}..."
+          copr-cli build --nowait "${COPR_PROJECT}" "${SRPM}"
