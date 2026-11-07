@@ -77,6 +77,7 @@ jobs:
             rpmdevtools \
             spectool \
             desktop-file-utils \
+            libappstream-glib \
             python3 \
             jq \
             copr-cli \
@@ -125,12 +126,12 @@ jobs:
         run: |
           PKG="${{ matrix.package }}"
           echo "Testing %prep stage for ${PKG}..."
-          rpmbuild -bp ~/rpmbuild/SPECS/${PKG}.spec
+          rpmbuild -bp --nodeps ~/rpmbuild/SPECS/${PKG}.spec
 
       - name: Build Source RPM (SRPM)
         run: |
           PKG="${{ matrix.package }}"
-          rpmbuild -bs ~/rpmbuild/SPECS/${PKG}.spec
+          rpmbuild -bs --nodeps ~/rpmbuild/SPECS/${PKG}.spec
 
       - name: Submit SRPM to Fedora COPR
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
