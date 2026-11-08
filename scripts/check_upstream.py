@@ -300,7 +300,6 @@ def get_open_pr_by_number(pr_number: int) -> dict[str, Any] | None:
 def sync_pr_for_update(
     update_info: PackageUpdate,
     existing_pr: dict[str, Any] | None = None,
-    force_rebase: bool = False,
 ) -> None:
     pkg = update_info["package"]
     new_ver = update_info["latest_version"]
@@ -312,18 +311,14 @@ def sync_pr_for_update(
 
     if existing_pr:
         pr_number = existing_pr["number"]
-        print(f"[{pkg}] Found open PR #{pr_number} on '{branch_name}'. Rebasing...")
-        git("checkout", "-B", branch_name, f"origin/{branch_name}")
-        rebase_proc = git("rebase", "origin/master", check=False)
-        if rebase_proc.returncode != 0:
-            print(
-                f"[{pkg}] Rebase conflict detected; resetting cleanly from origin/master..."
-            )
-            git("rebase", "--abort", check=False)
-            git("reset", "--hard", "origin/master")
+        print(
+            f"[{pkg}] Found open PR #{pr_number} on '{branch_name}'. Resetting cleanly from origin/master..."
+        )
     else:
         print(f"[{pkg}] Creating branch '{branch_name}' from origin/master...")
-        git("checkout", "-B", branch_name, "origin/master")
+
+    # Always reset the branch cleanly from origin/master to ensure exactly 1 commit
+    git("checkout", "-B", branch_name, "origin/master")
 
     # Apply spec and README changes
     update_spec_file(update_info["spec_path"], new_ver, update_info["build_id"])
@@ -336,9 +331,8 @@ def sync_pr_for_update(
         git("commit", "-m", f"chore({pkg}): bump to {new_ver}")
         git("push", "--force-with-lease", "-u", "origin", branch_name)
         print(f"[{pkg}] Pushed updated commit to '{branch_name}'.")
-    elif force_rebase and existing_pr:
-        git("push", "--force-with-lease", "origin", branch_name)
-        print(f"[{pkg}] Pushed rebased branch '{branch_name}'.")
+    else:
+        print(f"[{pkg}] No changes detected after applying updates from origin/master.")
 
     # Update or create PR metadata
     title = f"chore({pkg}): update to {new_ver}"
@@ -357,7 +351,7 @@ def sync_pr_for_update(
             print(f"[{pkg}] Updated PR #{pr_number} metadata.")
         except (subprocess.SubprocessError, OSError) as e:
             print(f"[{pkg}] Note: Could not update PR metadata: {e}", file=sys.stderr)
-    else:
+    elif status:
         gh(
             "pr",
             "create",
@@ -439,7 +433,7 @@ def main() -> None:
         print(
             f"Refreshing PR #{args.refresh_pr} for '{target_pkg}' (latest upstream: {info['latest_version']})..."
         )
-        sync_pr_for_update(info, existing_pr=pr, force_rebase=True)
+        sync_pr_for_update(info, existing_pr=pr)
         return
 
     # Handle --refresh [all|pkg]
@@ -452,7 +446,7 @@ def main() -> None:
                 info = latest_info.get(p)
                 if info:
                     print(f"Found open PR #{pr['number']} for '{p}'. Refreshing...")
-                    sync_pr_for_update(info, existing_pr=pr, force_rebase=True)
+                    sync_pr_for_update(info, existing_pr=pr)
                     refreshed_any = True
             else:
                 up = all_updates.get(p)
