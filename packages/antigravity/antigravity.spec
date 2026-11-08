@@ -44,7 +44,7 @@ tar -xzf %{SOURCE1} --strip-components=1
 %endif
 
 # Patch app.asar to fix titleBarOverlay collision in KDE Plasma 6
-python3 %{SOURCE4} resources/app.asar
+python3 %{SOURCE3} resources/app.asar
 
 # Remove in-app updater configuration so DNF manages application lifecycle
 rm -f resources/app-update.yml
