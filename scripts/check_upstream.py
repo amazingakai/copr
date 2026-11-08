@@ -81,6 +81,15 @@ PACKAGES: dict[str, PackageDefinition] = {
             "N/A",
         ),
     ),
+    "zoom": PackageDefinition(
+        name="zoom",
+        source_type="zoom_redirect",
+        api_url="https://zoom.us/client/latest/zoom_x86_64.rpm",
+        build_urls=lambda v, _: (
+            f"https://cdn.zoom.us/prod/{v}/zoom_x86_64.rpm",
+            "N/A",
+        ),
+    ),
 }
 
 
@@ -191,6 +200,28 @@ def check_package(
                             break
                 except (urllib.error.URLError, TimeoutError, OSError):
                     continue
+        elif pkg.source_type == "zoom_redirect":
+
+            class NoRedirect(urllib.request.HTTPRedirectHandler):
+                def redirect_request(self, *args: Any, **kwargs: Any) -> None:
+                    return None
+
+            opener = urllib.request.build_opener(NoRedirect)
+            head_req = urllib.request.Request(
+                pkg.api_url,
+                method="HEAD",
+                headers={"User-Agent": "Mozilla/5.0 (X11; Linux x86_64)"},
+            )
+            try:
+                resp = opener.open(head_req, timeout=10)
+                final_url = resp.geturl()
+            except urllib.error.HTTPError as e:
+                final_url = e.headers.get("Location") or ""
+
+            m = re.search(r"/prod/([^/]+)/zoom_x86_64\.rpm", final_url)
+            if m:
+                latest_ver = m.group(1)
+                source_label = "Zoom CDN Redirect"
         else:
             data = fetch_json(pkg.api_url)
             if pkg.source_type == "updater_api":

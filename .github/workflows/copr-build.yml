@@ -6,25 +6,27 @@ on:
       - master
       - main
     paths:
-      - 'packages/**'
+      - "packages/**"
   pull_request:
     branches:
       - master
       - main
     paths:
-      - 'packages/**'
+      - "packages/**"
   workflow_dispatch:
     inputs:
       package:
-        description: 'Package to build'
+        description: "Package to build"
         required: true
-        default: 'all'
+        default: "all"
         type: choice
         options:
           - all
           - antigravity
           - antigravity-ide
           - antigravity-cli
+          - slack
+          - zoom
 
 jobs:
   determine-packages:
@@ -42,7 +44,8 @@ jobs:
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             if [ "${{ inputs.package }}" = "all" ]; then
-              echo 'packages=["antigravity", "antigravity-ide", "antigravity-cli"]' >> "$GITHUB_OUTPUT"
+              JSON_ARRAY=$(ls packages | jq -R -s -c 'split("\n") | map(select(length > 0))')
+              echo "packages=$JSON_ARRAY" >> "$GITHUB_OUTPUT"
             else
               echo "packages=[\"${{ inputs.package }}\"]" >> "$GITHUB_OUTPUT"
             fi

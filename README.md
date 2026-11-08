@@ -35,21 +35,25 @@ sudo dnf install -y antigravity-cli
 
 # Slack Desktop Client
 sudo dnf install -y slack
+
+# Zoom Workplace
+sudo dnf install -y zoom
 ```
 
 ---
 
 ## Available Packages
 
-| Package               | Command           | Version      | Build Status                                                                                                                                                                                                       | Description                               |
-| :-------------------- | :---------------- | :----------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :---------------------------------------- |
-| **`antigravity`**     | `antigravity`     | `2.29.1-1`   | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/antigravity/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/antigravity/)         | Google Antigravity Desktop Client         |
-| **`antigravity-ide`** | `antigravity-ide` | `2.6.0-2`    | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/antigravity-ide/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/antigravity-ide/) | Google Antigravity Standalone IDE         |
-| **`antigravity-cli`** | `agy`             | `1.5.3-2`    | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/antigravity-cli/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/antigravity-cli/) | Google Antigravity CLI terminal interface |
-| **`slack`**           | `slack`           | `4.53.276-1` | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/slack/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/slack/)                     | Slack Desktop Client                      |
+| Package               | Command           | Version        | Build Status                                                                                                                                                                                                       | Description                               |
+| :-------------------- | :---------------- | :------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :---------------------------------------- |
+| **`antigravity`**     | `antigravity`     | `2.29.1-1`     | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/antigravity/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/antigravity/)         | Google Antigravity Desktop Client         |
+| **`antigravity-ide`** | `antigravity-ide` | `2.6.0-2`      | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/antigravity-ide/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/antigravity-ide/) | Google Antigravity Standalone IDE         |
+| **`antigravity-cli`** | `agy`             | `1.5.3-2`      | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/antigravity-cli/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/antigravity-cli/) | Google Antigravity CLI terminal interface |
+| **`slack`**           | `slack`           | `4.53.276-1`   | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/slack/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/slack/)                     | Slack Desktop Client                      |
+| **`zoom`**            | `zoom`            | `7.2.5.6661-1` | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/zoom/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/zoom/)                       | Zoom Workplace Video Conferencing         |
 
 ---
 
 ## License
 
-This packaging repository and automation scripts are licensed under the [MIT License](LICENSE). Google Antigravity, Antigravity IDE, and `agy` binaries are subject to Google's terms of service and software licenses.
+This packaging repository and automation scripts are licensed under the [MIT License](LICENSE). Google Antigravity, Antigravity IDE, `agy`, Slack, and Zoom binaries are subject to their respective terms of service and software licenses.

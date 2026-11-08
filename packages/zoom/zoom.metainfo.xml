@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>us.zoom.Zoom</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>LicenseRef-proprietary</project_license>
+  <name>Zoom Workplace</name>
+  <summary>Video conferencing, web conferencing, webinars, and screen sharing</summary>
+  <description>
+    <p>
+      Zoom Workplace is an AI-first collaboration platform that combines video
+      meetings, team chat, phone, whiteboard, and docs into one platform.
+    </p>
+    <p>
+      Connect with anyone on any device across Linux, Windows, macOS, iOS, and Android.
+      Features include high-definition video and audio conferencing, screen sharing,
+      chat channels, virtual backgrounds, meeting recording, and calendar integration.
+    </p>
+  </description>
+  <launchable type="desktop-id">Zoom.desktop</launchable>
+  <url type="homepage">https://zoom.us</url>
+  <url type="help">https://support.zoom.com</url>
+  <screenshots>
+    <screenshot type="default">
+      <image>https://explore.zoom.us/media/img-modernizemeeting_69f1e3a.png</image>
+    </screenshot>
+    <screenshot>
+      <image>https://explore.zoom.us/media/zfh-presentation.png</image>
+    </screenshot>
+  </screenshots>
+  <developer id="us.zoom">
+    <name>Zoom Video Communications, Inc.</name>
+  </developer>
+  <categories>
+    <category>Network</category>
+    <category>Telephony</category>
+    <category>VideoConference</category>
+  </categories>
+  <content_rating type="oars-1.1" />
+  <provides>
+    <binary>zoom</binary>
+    <id>Zoom.desktop</id>
+  </provides>
+</component>
