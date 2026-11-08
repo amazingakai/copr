@@ -3,7 +3,7 @@ name: Upstream Version Checker
 on:
   schedule:
     # Runs every 12 hours
-    - cron: '0 */12 * * *'
+    - cron: "0 */12 * * *"
   workflow_dispatch:
 
 permissions:
@@ -22,7 +22,10 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
-          python-version: '3.11'
+          python-version: "3.11"
+
+      - name: Install Python dependencies
+        run: pip install packaging
 
       - name: Configure Git identity
         run: |

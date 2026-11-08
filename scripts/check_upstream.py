@@ -1,59 +1,115 @@
 #!/usr/bin/env python3
-"""
-check_upstream.py - Monitor upstream Google Antigravity releases.
-
-Checks:
-  - antigravity (Desktop): storage.googleapis.com
-  - antigravity-ide:       edgedl.me.gvt1.com
-  - antigravity-cli:       GitHub releases API
-
-Updates corresponding .spec files and opens GitHub Pull Requests if updates exist.
-"""
+# /// script
+# requires-python = ">=3.11"
+# dependencies = [
+#     "packaging>=24.0",
+# ]
+# ///
+"""check_upstream.py - Monitor upstream releases and manage automated PR updates."""
 
 from __future__ import annotations
 
 import argparse
 import datetime
-import html
 import json
-import os
 import re
 import subprocess
 import sys
 import urllib.error
 import urllib.request
+from collections.abc import Callable
+from dataclasses import dataclass
+from pathlib import Path
 from typing import Any, TypedDict
 
-REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+from packaging.version import parse as parse_version
+
+REPO_ROOT = Path(__file__).resolve().parent.parent
 
 
 class PackageUpdate(TypedDict):
     package: str
-    spec_path: str
+    spec_path: Path
     current_version: str
     latest_version: str
     build_id: str | None
     url: str
 
 
-def fetch_url(url: str, headers: dict[str, str] | None = None) -> str:
+@dataclass(frozen=True)
+class PackageDefinition:
+    name: str
+    source_type: str  # "updater_api" | "github_api"
+    api_url: str
+    build_urls: Callable[[str, str | None], tuple[str, str]]
+
+
+PACKAGES: dict[str, PackageDefinition] = {
+    "antigravity": PackageDefinition(
+        name="antigravity",
+        source_type="updater_api",
+        api_url="https://antigravity-hub-auto-updater-974169037036.us-central1.run.app/releases",
+        build_urls=lambda v, b: (
+            f"https://storage.googleapis.com/antigravity-public/antigravity-hub/{v}-{b}/linux-x64/Antigravity.tar.gz",
+            f"https://storage.googleapis.com/antigravity-public/antigravity-hub/{v}-{b}/linux-arm/Antigravity.tar.gz",
+        ),
+    ),
+    "antigravity-ide": PackageDefinition(
+        name="antigravity-ide",
+        source_type="updater_api",
+        api_url="https://antigravity-ide-auto-updater-974169037036.us-central1.run.app/releases",
+        build_urls=lambda v, b: (
+            f"https://edgedl.me.gvt1.com/edgedl/release2/j0qc3/antigravity/stable/{v}-{b}/linux-x64/Antigravity%20IDE.tar.gz",
+            f"https://edgedl.me.gvt1.com/edgedl/release2/j0qc3/antigravity/stable/{v}-{b}/linux-arm/Antigravity%20IDE.tar.gz",
+        ),
+    ),
+    "antigravity-cli": PackageDefinition(
+        name="antigravity-cli",
+        source_type="github_api",
+        api_url="https://api.github.com/repos/google-antigravity/antigravity-cli/releases/latest",
+        build_urls=lambda v, _: (
+            f"https://github.com/google-antigravity/antigravity-cli/releases/download/{v}/agy_cli_linux_x64.tar.gz",
+            f"https://github.com/google-antigravity/antigravity-cli/releases/download/{v}/agy_cli_linux_arm64.tar.gz",
+        ),
+    ),
+}
+
+
+# --- Helpers ---
+
+
+def run(cmd: list[str], check: bool = True) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(cmd, check=check, capture_output=True, text=True)
+
+
+def git(*args: str, check: bool = True) -> subprocess.CompletedProcess[str]:
+    return run(["git", *args], check=check)
+
+
+def gh(*args: str, check: bool = True) -> subprocess.CompletedProcess[str]:
+    return run(["gh", *args], check=check)
+
+
+def fetch_json(
+    url: str, headers: dict[str, str] | None = None, timeout: int = 15
+) -> Any:
+    """Fetch and decode JSON from URL via urllib."""
     req_headers = {
-        "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36",
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,application/json,*/*;q=0.8",
-        "Accept-Language": "en-US,en;q=0.5",
+        "User-Agent": "Mozilla/5.0 (X11; Linux x86_64)",
+        "Accept": "application/json,*/*;q=0.8",
     }
     if headers:
         req_headers.update(headers)
     req = urllib.request.Request(url, headers=req_headers)
-    with urllib.request.urlopen(req, timeout=45) as resp:
-        return resp.read().decode("utf-8", errors="replace")
+    with urllib.request.urlopen(req, timeout=timeout) as resp:
+        return json.loads(resp.read().decode("utf-8"))
 
 
-def get_current_spec_version(spec_path: str) -> tuple[str, str | None]:
+def get_current_spec_version(spec_path: Path) -> tuple[str, str | None]:
     """Extract (version, build_id) from an RPM spec file."""
     version = ""
     build_id: str | None = None
-    with open(spec_path, encoding="utf-8") as f:
+    with spec_path.open(encoding="utf-8") as f:
         for line in f:
             v_match = re.match(r"^Version:\s*([^\s]+)", line)
             if v_match:
@@ -64,183 +120,107 @@ def get_current_spec_version(spec_path: str) -> tuple[str, str | None]:
     return version, build_id
 
 
-def version_tuple(ver_str: str) -> tuple[int, ...]:
-    """Convert version string like 2.29.0 into tuple of ints for comparison."""
-    clean = re.sub(r"[^\d.]", "", ver_str)
-    return tuple(int(x) for x in clean.split(".") if x.isdigit())
+def is_newer(
+    latest_ver: str,
+    latest_build: str | None,
+    cur_ver: str,
+    cur_build: str | None,
+) -> bool:
+    """Compare upstream version/build against current spec version/build."""
+    v_latest = parse_version(latest_ver)
+    v_cur = parse_version(cur_ver)
+    if v_latest > v_cur:
+        return True
+    if v_latest == v_cur and latest_build and cur_build:
+        return int(latest_build) > int(cur_build)
+    return False
 
 
-def parse_dataset(attr_name: str, html_text: str) -> list[dict[str, Any]] | None:
-    """Extract and decode a JSON data attribute from HTML."""
-    m = re.search(rf"{attr_name}=[\x27\"]([^\x27\"]+)[\x27\"]", html_text)
-    if not m:
-        return None
+def check_package(
+    pkg: PackageDefinition, verbose: bool = False
+) -> tuple[PackageUpdate | None, PackageUpdate | None]:
+    """Check a single package against upstream and return (update_if_newer, latest_info)."""
+    spec_path = REPO_ROOT / "packages" / pkg.name / f"{pkg.name}.spec"
+    cur_ver, cur_build = get_current_spec_version(spec_path)
+
+    latest_ver: str | None = None
+    latest_build: str | None = None
+    source_label = ""
+
     try:
-        data: Any = json.loads(html.unescape(m.group(1)))
-        if isinstance(data, list):
-            return data
-        return None
-    except (json.JSONDecodeError, UnicodeDecodeError) as e:
-        print(f"Warning: Failed to parse JSON for {attr_name}: {e}", file=sys.stderr)
-        return None
+        data = fetch_json(pkg.api_url)
+        if pkg.source_type == "updater_api":
+            if isinstance(data, list) and len(data) > 0:
+                first = data[0]
+                latest_ver = str(first["version"])
+                latest_build = str(first.get("execution_id", ""))
+                source_label = "Live Cloud Run Auto-Updater API"
+        elif pkg.source_type == "github_api":
+            if isinstance(data, dict):
+                tag = str(data.get("tag_name", "")).lstrip("v")
+                if tag:
+                    latest_ver = tag
+                    source_label = "GitHub Releases API"
+    except (
+        urllib.error.URLError,
+        TimeoutError,
+        OSError,
+        json.JSONDecodeError,
+        KeyError,
+    ) as e:
+        print(f"[{pkg.name}] Error checking upstream API: {e}", file=sys.stderr)
+        return None, None
 
+    if not latest_ver:
+        print(
+            f"[{pkg.name}] Warning: No version info returned by upstream API!",
+            file=sys.stderr,
+        )
+        return None, None
 
-def check_all_from_releases(
-    releases_html: str, verbose: bool = False
-) -> dict[str, PackageUpdate | None]:
-    results: dict[str, PackageUpdate | None] = {
-        "antigravity": None,
-        "antigravity-ide": None,
-        "antigravity-cli": None,
+    x64_url, arm_url = pkg.build_urls(latest_ver, latest_build)
+    display_ver = f"{latest_ver}-{latest_build}" if latest_build else latest_ver
+    display_spec = f"{cur_ver}-{cur_build}" if cur_build else cur_ver
+    print(f"[{pkg.name}] Upstream: {display_ver} | Spec: {display_spec}")
+
+    if verbose:
+        print(f"  └─ Source: {source_label}")
+        print(f"  └─ Download x64: {x64_url}")
+        print(f"  └─ Download arm64: {arm_url}")
+
+    info: PackageUpdate = {
+        "package": pkg.name,
+        "spec_path": spec_path,
+        "current_version": cur_ver,
+        "latest_version": latest_ver,
+        "build_id": latest_build,
+        "url": f"x86_64: {x64_url}\n- aarch64: {arm_url}",
     }
 
-    # 1. Desktop App
-    ag_items = parse_dataset("data-fallback-antigravity", releases_html)
-    spec_path_hub = os.path.join(
-        REPO_ROOT, "packages", "antigravity", "antigravity.spec"
-    )
-    cur_ver_hub, cur_build_hub = get_current_spec_version(spec_path_hub)
+    update = info if is_newer(latest_ver, latest_build, cur_ver, cur_build) else None
+    return update, info
 
-    if ag_items and len(ag_items) > 0:
-        latest = ag_items[0]
-        latest_hub_ver = str(latest["version"])
-        latest_hub_build = str(latest["execution_id"])
-        hub_url_x64 = f"https://storage.googleapis.com/antigravity-public/antigravity-hub/{latest_hub_ver}-{latest_hub_build}/linux-x64/Antigravity.tar.gz"
-        hub_url_arm = f"https://storage.googleapis.com/antigravity-public/antigravity-hub/{latest_hub_ver}-{latest_hub_build}/linux-arm/Antigravity.tar.gz"
 
-        print(
-            f"[antigravity] Upstream: {latest_hub_ver}-{latest_hub_build} | Spec: {cur_ver_hub}-{cur_build_hub}"
-        )
-        if verbose:
-            print(
-                "  └─ Source: https://antigravity.google/releases (data-fallback-antigravity)"
-            )
-            print(f"  └─ Download x64: {hub_url_x64}")
-            print(f"  └─ Download arm64: {hub_url_arm}")
+def check_all(
+    verbose: bool = False,
+) -> tuple[dict[str, PackageUpdate | None], dict[str, PackageUpdate]]:
+    updates: dict[str, PackageUpdate | None] = {}
+    latest_info: dict[str, PackageUpdate] = {}
+    for name, pkg in PACKAGES.items():
+        up, info = check_package(pkg, verbose=verbose)
+        updates[name] = up
+        if info:
+            latest_info[name] = info
+    return updates, latest_info
 
-        if (version_tuple(latest_hub_ver) > version_tuple(cur_ver_hub)) or (
-            latest_hub_ver == cur_ver_hub
-            and cur_build_hub
-            and int(latest_hub_build) > int(cur_build_hub)
-        ):
-            results["antigravity"] = {
-                "package": "antigravity",
-                "spec_path": spec_path_hub,
-                "current_version": cur_ver_hub,
-                "latest_version": latest_hub_ver,
-                "build_id": latest_hub_build,
-                "url": f"x86_64: {hub_url_x64}\n- aarch64: {hub_url_arm}",
-            }
-    else:
-        print(
-            "[antigravity] Warning: data-fallback-antigravity not found in releases HTML!",
-            file=sys.stderr,
-        )
 
-    # 2. Standalone IDE
-    ide_items = parse_dataset("data-fallback-ide", releases_html)
-    spec_path_ide = os.path.join(
-        REPO_ROOT, "packages", "antigravity-ide", "antigravity-ide.spec"
-    )
-    cur_ver_ide, cur_build_ide = get_current_spec_version(spec_path_ide)
-
-    if ide_items and len(ide_items) > 0:
-        latest = ide_items[0]
-        latest_ide_ver = str(latest["version"])
-        latest_ide_build = str(latest["execution_id"])
-        ide_url_x64 = f"https://edgedl.me.gvt1.com/edgedl/release2/j0qc3/antigravity/stable/{latest_ide_ver}-{latest_ide_build}/linux-x64/Antigravity%20IDE.tar.gz"
-        ide_url_arm = f"https://edgedl.me.gvt1.com/edgedl/release2/j0qc3/antigravity/stable/{latest_ide_ver}-{latest_ide_build}/linux-arm/Antigravity%20IDE.tar.gz"
-
-        print(
-            f"[antigravity-ide] Upstream: {latest_ide_ver}-{latest_ide_build} | Spec: {cur_ver_ide}-{cur_build_ide}"
-        )
-        if verbose:
-            print(
-                "  └─ Source: https://antigravity.google/releases (data-fallback-ide)"
-            )
-            print(f"  └─ Download x64: {ide_url_x64}")
-            print(f"  └─ Download arm64: {ide_url_arm}")
-
-        if (version_tuple(latest_ide_ver) > version_tuple(cur_ver_ide)) or (
-            latest_ide_ver == cur_ver_ide
-            and cur_build_ide
-            and int(latest_ide_build) > int(cur_build_ide)
-        ):
-            results["antigravity-ide"] = {
-                "package": "antigravity-ide",
-                "spec_path": spec_path_ide,
-                "current_version": cur_ver_ide,
-                "latest_version": latest_ide_ver,
-                "build_id": latest_ide_build,
-                "url": f"x86_64: {ide_url_x64}\n- aarch64: {ide_url_arm}",
-            }
-    else:
-        print(
-            "[antigravity-ide] Warning: data-fallback-ide not found in releases HTML!",
-            file=sys.stderr,
-        )
-
-    # 3. CLI
-    cli_items = parse_dataset("data-fallback-cli", releases_html)
-    spec_path_cli = os.path.join(
-        REPO_ROOT, "packages", "antigravity-cli", "antigravity-cli.spec"
-    )
-    cur_ver_cli, _ = get_current_spec_version(spec_path_cli)
-
-    candidate_cli_ver: str | None = None
-    cli_source = "webpage"
-    if cli_items and len(cli_items) > 0:
-        candidate_cli_ver = str(cli_items[0]["version"])
-
-    # Also check GitHub API for the latest published tag
-    try:
-        gh_raw = fetch_url(
-            "https://api.github.com/repos/google-antigravity/antigravity-cli/releases/latest"
-        )
-        gh_data: Any = json.loads(gh_raw)
-        if isinstance(gh_data, dict):
-            gh_tag = str(gh_data.get("tag_name", "")).lstrip("v")
-            if gh_tag and (
-                not candidate_cli_ver
-                or version_tuple(gh_tag) > version_tuple(candidate_cli_ver)
-            ):
-                candidate_cli_ver = gh_tag
-                cli_source = "GitHub Releases API"
-    except (urllib.error.URLError, json.JSONDecodeError, TimeoutError, OSError):
-        pass
-
-    if candidate_cli_ver:
-        cli_url_x64 = f"https://github.com/google-antigravity/antigravity-cli/releases/download/{candidate_cli_ver}/agy_cli_linux_x64.tar.gz"
-        cli_url_arm = f"https://github.com/google-antigravity/antigravity-cli/releases/download/{candidate_cli_ver}/agy_cli_linux_arm64.tar.gz"
-        print(f"[antigravity-cli] Upstream: {candidate_cli_ver} | Spec: {cur_ver_cli}")
-        if verbose:
-            print(f"  └─ Source: {cli_source}")
-            print(f"  └─ Download x64: {cli_url_x64}")
-            print(f"  └─ Download arm64: {cli_url_arm}")
-
-        if version_tuple(candidate_cli_ver) > version_tuple(cur_ver_cli):
-            results["antigravity-cli"] = {
-                "package": "antigravity-cli",
-                "spec_path": spec_path_cli,
-                "current_version": cur_ver_cli,
-                "latest_version": candidate_cli_ver,
-                "build_id": None,
-                "url": f"x86_64: {cli_url_x64}\n- aarch64: {cli_url_arm}",
-            }
-    else:
-        print(
-            "[antigravity-cli] Warning: CLI version not found in HTML or GitHub!",
-            file=sys.stderr,
-        )
-
-    return results
+# --- Spec & README Modifiers ---
 
 
 def update_spec_file(
-    spec_path: str, new_version: str, new_build_id: str | None
+    spec_path: Path, new_version: str, new_build_id: str | None
 ) -> None:
-    with open(spec_path, encoding="utf-8") as f:
-        content = f.read()
+    content = spec_path.read_text(encoding="utf-8")
 
     # Update Version:
     content = re.sub(r"(Version:\s*)[^\n]+", rf"\g<1>{new_version}", content, count=1)
@@ -256,93 +236,264 @@ def update_spec_file(
 
     # Add changelog entry
     now = datetime.datetime.now(datetime.UTC).strftime("%a %b %d %Y")
-    log_entry = f"* {now} Azhar Momin <azhar-momin@outlook.com> - {new_version}-1\n- Upstream release update to {new_version}\n\n"
+    log_entry = (
+        f"* {now} Azhar Momin <azhar-momin@outlook.com> - {new_version}-1\n"
+        f"- Upstream release update to {new_version}\n\n"
+    )
     content = re.sub(r"(%changelog\n)", rf"\g<1>{log_entry}", content, count=1)
 
-    with open(spec_path, "w", encoding="utf-8") as f:
-        f.write(content)
+    spec_path.write_text(content, encoding="utf-8")
 
 
-def create_pr_for_update(update_info: PackageUpdate) -> None:
+def update_readme_version(pkg: str, new_version_release: str) -> None:
+    readme_path = REPO_ROOT / "README.md"
+    if not readme_path.is_file():
+        return
+    content = readme_path.read_text(encoding="utf-8")
+
+    pattern = rf"(\|\s*\*\*`{re.escape(pkg)}`\*\*\s*\|\s*`[^`]+`\s*\|\s*)`[^`]+`(\s*\|)"
+    replacement = rf"\g<1>`{new_version_release}`\g<2>"
+    new_content = re.sub(pattern, replacement, content)
+
+    if new_content != content:
+        readme_path.write_text(new_content, encoding="utf-8")
+        print(f"Updated README.md version for {pkg} -> {new_version_release}")
+
+
+# --- GitHub PR Integration ---
+
+
+def find_open_pr_for_package(pkg: str) -> dict[str, Any] | None:
+    try:
+        res = gh(
+            "pr", "list", "--state", "open", "--json", "number,title,headRefName,body"
+        )
+        prs = json.loads(res.stdout)
+        prefix = f"update/{pkg}-"
+        for pr in prs:
+            head = pr.get("headRefName", "")
+            title = pr.get("title", "")
+            if head.startswith(prefix) or f"({pkg})" in title:
+                return pr
+    except (subprocess.SubprocessError, json.JSONDecodeError, OSError) as e:
+        print(f"Note: Could not query GitHub PRs: {e}", file=sys.stderr)
+    return None
+
+
+def get_open_pr_by_number(pr_number: int) -> dict[str, Any] | None:
+    try:
+        res = gh(
+            "pr",
+            "view",
+            str(pr_number),
+            "--json",
+            "number,title,headRefName,body,state",
+        )
+        pr = json.loads(res.stdout)
+        if pr.get("state") == "OPEN":
+            return pr
+    except (subprocess.SubprocessError, json.JSONDecodeError, OSError) as e:
+        print(f"Note: Could not query PR #{pr_number}: {e}", file=sys.stderr)
+    return None
+
+
+def sync_pr_for_update(
+    update_info: PackageUpdate,
+    existing_pr: dict[str, Any] | None = None,
+    force_rebase: bool = False,
+) -> None:
     pkg = update_info["package"]
     new_ver = update_info["latest_version"]
-    branch_name = f"update/{pkg}-{new_ver}"
-
-    print(f"Creating branch and Pull Request for {pkg} -> {new_ver}...")
-    subprocess.run(["git", "checkout", "-b", branch_name], check=True)
-    subprocess.run(["git", "add", update_info["spec_path"]], check=True)
-    subprocess.run(
-        ["git", "commit", "-m", f"chore({pkg}): bump to {new_ver}"], check=True
+    branch_name = (
+        existing_pr["headRefName"] if existing_pr else f"update/{pkg}-{new_ver}"
     )
-    subprocess.run(["git", "push", "-u", "origin", branch_name], check=True)
 
+    git("fetch", "origin", check=False)
+
+    if existing_pr:
+        pr_number = existing_pr["number"]
+        print(f"[{pkg}] Found open PR #{pr_number} on '{branch_name}'. Rebasing...")
+        git("checkout", "-B", branch_name, f"origin/{branch_name}")
+        rebase_proc = git("rebase", "origin/master", check=False)
+        if rebase_proc.returncode != 0:
+            print(
+                f"[{pkg}] Rebase conflict detected; resetting cleanly from origin/master..."
+            )
+            git("rebase", "--abort", check=False)
+            git("reset", "--hard", "origin/master")
+    else:
+        print(f"[{pkg}] Creating branch '{branch_name}' from origin/master...")
+        git("checkout", "-B", branch_name, "origin/master")
+
+    # Apply spec and README changes
+    update_spec_file(update_info["spec_path"], new_ver, update_info["build_id"])
+    update_readme_version(pkg, f"{new_ver}-1")
+
+    # Commit and push changes
+    status = git("status", "--porcelain", check=False).stdout.strip()
+    if status:
+        git("add", str(update_info["spec_path"]), "README.md")
+        git("commit", "-m", f"chore({pkg}): bump to {new_ver}")
+        git("push", "--force-with-lease", "-u", "origin", branch_name)
+        print(f"[{pkg}] Pushed updated commit to '{branch_name}'.")
+    elif force_rebase and existing_pr:
+        git("push", "--force-with-lease", "origin", branch_name)
+        print(f"[{pkg}] Pushed rebased branch '{branch_name}'.")
+
+    # Update or create PR metadata
     title = f"chore({pkg}): update to {new_ver}"
     body = (
-        f"Automated update for **{pkg}**.\n\n"
-        f"- Previous Version: `{update_info['current_version']}`\n"
-        f"- Upstream Version: `{new_ver}`\n\n"
+        f"Automated update for **{pkg}** to `{new_ver}`.\n\n"
+        f"- Upstream Version: `{new_ver}`\n"
+        f"- Download URLs:\n"
+        f"  - {update_info['url']}\n\n"
         f"Review spec changes and merge to trigger Fedora COPR build."
     )
-    subprocess.run(
-        ["gh", "pr", "create", "--title", title, "--body", body, "--head", branch_name],
-        check=True,
-    )
-    subprocess.run(["git", "checkout", "master"], check=True)
+
+    if existing_pr:
+        pr_number = existing_pr["number"]
+        try:
+            gh("pr", "edit", str(pr_number), "--title", title, "--body", body)
+            print(f"[{pkg}] Updated PR #{pr_number} metadata.")
+        except (subprocess.SubprocessError, OSError) as e:
+            print(f"[{pkg}] Note: Could not update PR metadata: {e}", file=sys.stderr)
+    else:
+        gh(
+            "pr",
+            "create",
+            "--title",
+            title,
+            "--body",
+            body,
+            "--head",
+            branch_name,
+            "--base",
+            "master",
+        )
+        print(f"[{pkg}] Created Pull Request for '{branch_name}'.")
+
+    git("checkout", "master")
+
+
+# --- Main Entrypoint ---
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Check for upstream Antigravity updates."
+        description="Check for upstream updates and synchronize Fedora COPR packaging."
     )
-    parser.add_argument(
+    _ = parser.add_argument(
         "--create-pr", action="store_true", help="Create Git branch and PR via gh CLI."
     )
-    parser.add_argument(
+    _ = parser.add_argument(
+        "--refresh",
+        nargs="?",
+        const="all",
+        help="Rebase and sync open PR(s) against upstream and origin/master (e.g. '--refresh', '--refresh antigravity').",
+    )
+    _ = parser.add_argument(
+        "--refresh-pr",
+        type=int,
+        help="Target a specific open PR number to rebase and refresh against upstream.",
+    )
+    _ = parser.add_argument(
         "-v",
         "--verbose",
         action="store_true",
         help="Show full debug info, URLs, and origins.",
     )
-    parser.add_argument(
-        "--file", help="Path to local releases.html file (bypasses network fetch)."
+    _ = parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Check versions without modifying spec files or creating/refreshing PRs.",
     )
     args = parser.parse_args()
 
-    updates: list[PackageUpdate] = []
-
     try:
-        if args.file and os.path.isfile(args.file):
-            if args.verbose:
-                print(f"Reading releases from local file: {args.file}")
-            with open(args.file, encoding="utf-8") as f:
-                releases_html = f.read()
-        else:
-            if args.verbose:
-                print("Fetching https://antigravity.google/releases (timeout: 45s)...")
-            releases_html = fetch_url("https://antigravity.google/releases")
-        all_res = check_all_from_releases(releases_html, verbose=args.verbose)
-
-        for pkg in ["antigravity", "antigravity-ide", "antigravity-cli"]:
-            up = all_res.get(pkg)
-            if up:
-                print(
-                    f"[{pkg}] Update available: {up['current_version']} -> {up['latest_version']}"
-                )
-                updates.append(up)
-            else:
-                print(f"[{pkg}] Up to date.")
+        all_updates, latest_info = check_all(verbose=args.verbose)
     except (urllib.error.URLError, TimeoutError, OSError) as e:
-        print(f"Warning: Failed to fetch releases page: {e}", file=sys.stderr)
+        print(f"Warning: Failed to fetch upstream info: {e}", file=sys.stderr)
+        return
+
+    # Handle --refresh-pr <NUMBER>
+    if args.refresh_pr:
+        pr = get_open_pr_by_number(args.refresh_pr)
+        if not pr:
+            print(
+                f"Error: Open PR #{args.refresh_pr} not found or is closed.",
+                file=sys.stderr,
+            )
+            sys.exit(1)
+        target_pkg = None
+        for p in PACKAGES:
+            if p in pr.get("headRefName", "") or f"({p})" in pr.get("title", ""):
+                target_pkg = p
+                break
+        if not target_pkg or target_pkg not in latest_info:
+            print(
+                f"Error: Could not determine package for PR #{args.refresh_pr}",
+                file=sys.stderr,
+            )
+            sys.exit(1)
+        info = latest_info[target_pkg]
+        print(
+            f"Refreshing PR #{args.refresh_pr} for '{target_pkg}' (latest upstream: {info['latest_version']})..."
+        )
+        sync_pr_for_update(info, existing_pr=pr, force_rebase=True)
+        return
+
+    # Handle --refresh [all|pkg]
+    if args.refresh:
+        target_pkgs = list(PACKAGES.keys()) if args.refresh == "all" else [args.refresh]
+        refreshed_any = False
+        for p in target_pkgs:
+            pr = find_open_pr_for_package(p)
+            if pr:
+                info = latest_info.get(p)
+                if info:
+                    print(f"Found open PR #{pr['number']} for '{p}'. Refreshing...")
+                    sync_pr_for_update(info, existing_pr=pr, force_rebase=True)
+                    refreshed_any = True
+            else:
+                up = all_updates.get(p)
+                if up:
+                    print(
+                        f"No open PR for '{p}', but update {up['latest_version']} is available. Creating PR..."
+                    )
+                    sync_pr_for_update(up)
+                    refreshed_any = True
+        if not refreshed_any:
+            print(
+                "No open PRs found to refresh and all target packages are up to date."
+            )
+        return
+
+    # Standard check / update flow
+    updates = [up for up in all_updates.values() if up is not None]
+    for pkg in PACKAGES:
+        up = all_updates.get(pkg)
+        if up:
+            print(
+                f"[{pkg}] Update available: {up['current_version']} -> {up['latest_version']}"
+            )
+        else:
+            print(f"[{pkg}] Up to date.")
 
     if not updates:
         print("All packages are currently up-to-date with upstream.")
         return
 
+    if args.dry_run:
+        print("[dry-run] Check completed. No files modified.")
+        return
+
     for up in updates:
-        update_spec_file(up["spec_path"], up["latest_version"], up["build_id"])
-        print(f"Updated spec file: {up['spec_path']}")
         if args.create_pr:
-            create_pr_for_update(up)
+            sync_pr_for_update(up)
+        else:
+            update_spec_file(up["spec_path"], up["latest_version"], up["build_id"])
+            update_readme_version(up["package"], f"{up['latest_version']}-1")
+            print(f"Updated spec file: {up['spec_path']}")
 
 
 if __name__ == "__main__":

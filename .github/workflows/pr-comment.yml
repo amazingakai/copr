@@ -1,0 +1,60 @@
+name: PR Commands
+
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  pr-command:
+    # Only run on pull requests when commented by repo owner/collaborator with /refresh or /rebase
+    if: |
+      github.event.issue.pull_request &&
+      contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.comment.author_association) &&
+      (startsWith(github.event.comment.body, '/refresh') || startsWith(github.event.comment.body, '/rebase'))
+    runs-on: ubuntu-latest
+    steps:
+      - name: Acknowledge command with reaction
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh api "repos/${{ github.repository }}/issues/comments/${{ github.event.comment.id }}/reactions" \
+            -f content=eyes || true
+
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.11"
+
+      - name: Install Python dependencies
+        run: pip install packaging
+
+      - name: Configure Git identity
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Refresh and rebase PR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_NUM="${{ github.event.issue.number }}"
+          python3 scripts/check_upstream.py --refresh-pr "${PR_NUM}" -v
+
+      - name: Post success comment
+        if: success()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr comment "${{ github.event.issue.number }}" \
+            --body "✅ Rebased onto \`master\` and verified against latest upstream releases."

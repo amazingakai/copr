@@ -1,0 +1,16 @@
+[tool.ruff]
+target-version = "py311"
+line-length = 88
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "PL", "RUF"]
+ignore = [
+    "E501",    # Line too long (formatter manages lines)
+    "PLR0912", # Too many branches
+    "PLR0915", # Too many statements
+    "PLR2004", # Magic value in comparison
+]
+
+[tool.basedpyright]
+typeCheckingMode = "standard"
+pythonVersion = "3.11"
