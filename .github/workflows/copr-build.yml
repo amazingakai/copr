@@ -35,7 +35,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          fetch-depth: 2
+          fetch-depth: 0
 
       - name: Determine changed packages
         id: set-matrix
@@ -47,8 +47,14 @@ jobs:
               echo "packages=[\"${{ inputs.package }}\"]" >> "$GITHUB_OUTPUT"
             fi
           elif [ "${{ github.event_name }}" = "pull_request" ]; then
-            CHANGED=$(git diff --name-only origin/${{ github.base_ref }} HEAD | grep -E '^packages/' | cut -d/ -f2 | sort -u || true)
-            JSON_ARRAY=$(echo "$CHANGED" | jq -R -s -c 'split("\n")[:-1]')
+            BASE="${{ github.event.pull_request.base.sha }}"
+            HEAD="${{ github.event.pull_request.head.sha }}"
+            CHANGED=$(git diff --name-only "$BASE" "$HEAD" | grep -E '^packages/' | cut -d/ -f2 | sort -u || true)
+            if [ -z "$CHANGED" ]; then
+              JSON_ARRAY="[]"
+            else
+              JSON_ARRAY=$(echo "$CHANGED" | jq -R -s -c 'split("\n") | map(select(length > 0))')
+            fi
             echo "packages=$JSON_ARRAY" >> "$GITHUB_OUTPUT"
           else
             CHANGED=$(git diff --name-only HEAD~1 HEAD | grep -E '^packages/' | cut -d/ -f2 | sort -u || true)
@@ -56,12 +62,13 @@ jobs:
               # Fallback: check all packages if HEAD~1 is not available (e.g. initial push)
               CHANGED=$(ls packages)
             fi
-            JSON_ARRAY=$(echo "$CHANGED" | jq -R -s -c 'split("\n")[:-1]')
+            JSON_ARRAY=$(echo "$CHANGED" | jq -R -s -c 'split("\n") | map(select(length > 0))')
             echo "packages=$JSON_ARRAY" >> "$GITHUB_OUTPUT"
           fi
 
   build-and-submit:
     needs: determine-packages
+    if: needs.determine-packages.outputs.packages != '[]' && needs.determine-packages.outputs.packages != ''
     runs-on: ubuntu-latest
     container:
       image: fedora:latest

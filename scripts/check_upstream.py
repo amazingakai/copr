@@ -194,7 +194,7 @@ def check_package(
         "current_version": cur_ver,
         "latest_version": latest_ver,
         "build_id": latest_build,
-        "url": f"x86_64: {x64_url}\n- aarch64: {arm_url}",
+        "url": f"  - x86_64: {x64_url}\n  - aarch64: {arm_url}",
     }
 
     update = info if is_newer(latest_ver, latest_build, cur_ver, cur_build) else None
@@ -346,7 +346,7 @@ def sync_pr_for_update(
         f"Automated update for **{pkg}** to `{new_ver}`.\n\n"
         f"- Upstream Version: `{new_ver}`\n"
         f"- Download URLs:\n"
-        f"  - {update_info['url']}\n\n"
+        f"{update_info['url']}\n\n"
         f"Review spec changes and merge to trigger Fedora COPR build."
     )
 
