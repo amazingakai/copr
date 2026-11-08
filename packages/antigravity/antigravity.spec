@@ -8,10 +8,9 @@ License:        LicenseRef-Google-Antigravity
 URL:            https://antigravity.google
 Source0:        https://storage.googleapis.com/antigravity-public/antigravity-hub/%{version}-%{build_id}/linux-x64/Antigravity.tar.gz#/Antigravity-x64-%{version}.tar.gz
 Source1:        https://storage.googleapis.com/antigravity-public/antigravity-hub/%{version}-%{build_id}/linux-arm/Antigravity.tar.gz#/Antigravity-arm64-%{version}.tar.gz
-Source2:        antigravity.sh
-Source3:        antigravity.desktop
-Source4:        patch-kdecoration.py
-Source5:        antigravity.appdata.xml
+Source2:        antigravity.desktop
+Source3:        patch-kdecoration.py
+Source4:        antigravity.appdata.xml
 
 ExclusiveArch:  x86_64 aarch64
 
@@ -64,17 +63,17 @@ cp -a . %{buildroot}/opt/antigravity/
 chmod 755 %{buildroot}/opt/antigravity/antigravity
 chmod 4755 %{buildroot}/opt/antigravity/chrome-sandbox 2>/dev/null || true
 
-# Install launcher wrapper
+# Create symlink in /usr/bin
 mkdir -p %{buildroot}%{_bindir}
-install -m 755 %{SOURCE2} %{buildroot}%{_bindir}/antigravity
+ln -sf /opt/antigravity/antigravity %{buildroot}%{_bindir}/antigravity
 
 # Install desktop entry
 mkdir -p %{buildroot}%{_datadir}/applications
-desktop-file-install --dir=%{buildroot}%{_datadir}/applications %{SOURCE3}
+desktop-file-install --dir=%{buildroot}%{_datadir}/applications %{SOURCE2}
 
 # Install AppStream metadata
 mkdir -p %{buildroot}%{_datadir}/metainfo
-install -m 644 %{SOURCE5} %{buildroot}%{_datadir}/metainfo/antigravity.appdata.xml
+install -m 644 %{SOURCE4} %{buildroot}%{_datadir}/metainfo/antigravity.appdata.xml
 
 # Extract high-resolution application icon from app.asar
 mkdir -p %{buildroot}%{_datadir}/pixmaps

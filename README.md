@@ -32,17 +32,21 @@ sudo dnf install -y antigravity-ide
 
 # Antigravity CLI
 sudo dnf install -y antigravity-cli
+
+# Slack Desktop Client
+sudo dnf install -y slack
 ```
 
 ---
 
 ## Available Packages
 
-| Package               | Command           | Version    | Build Status                                                                                                                                                                                                       | Description                               |
-| :-------------------- | :---------------- | :--------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :---------------------------------------- |
-| **`antigravity`**     | `antigravity`     | `2.29.1-1` | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/antigravity/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/antigravity/)         | Google Antigravity Desktop Client         |
-| **`antigravity-ide`** | `antigravity-ide` | `2.6.0-2`  | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/antigravity-ide/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/antigravity-ide/) | Google Antigravity Standalone IDE         |
-| **`antigravity-cli`** | `agy`             | `1.5.3-2`  | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/antigravity-cli/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/antigravity-cli/) | Google Antigravity CLI terminal interface |
+| Package               | Command           | Version      | Build Status                                                                                                                                                                                                       | Description                               |
+| :-------------------- | :---------------- | :----------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :---------------------------------------- |
+| **`antigravity`**     | `antigravity`     | `2.29.1-1`   | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/antigravity/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/antigravity/)         | Google Antigravity Desktop Client         |
+| **`antigravity-ide`** | `antigravity-ide` | `2.6.0-2`    | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/antigravity-ide/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/antigravity-ide/) | Google Antigravity Standalone IDE         |
+| **`antigravity-cli`** | `agy`             | `1.5.3-2`    | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/antigravity-cli/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/antigravity-cli/) | Google Antigravity CLI terminal interface |
+| **`slack`**           | `slack`           | `4.53.276-1` | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/slack/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/slack/)                     | Slack Desktop Client                      |
 
 ---
 

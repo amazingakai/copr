@@ -72,6 +72,15 @@ PACKAGES: dict[str, PackageDefinition] = {
             f"https://github.com/google-antigravity/antigravity-cli/releases/download/{v}/agy_cli_linux_arm64.tar.gz",
         ),
     ),
+    "slack": PackageDefinition(
+        name="slack",
+        source_type="slack_web",
+        api_url="https://slack.com/release-notes/linux",
+        build_urls=lambda v, _: (
+            f"https://downloads.slack-edge.com/desktop-releases/linux/x64/{v}/slack-{v}-0.1.el8.x86_64.rpm",
+            "N/A",
+        ),
+    ),
 }
 
 
@@ -103,6 +112,20 @@ def fetch_json(
     req = urllib.request.Request(url, headers=req_headers)
     with urllib.request.urlopen(req, timeout=timeout) as resp:
         return json.loads(resp.read().decode("utf-8"))
+
+
+def fetch_text(
+    url: str, headers: dict[str, str] | None = None, timeout: int = 15
+) -> str:
+    """Fetch text/HTML content from URL via urllib."""
+    req_headers = {
+        "User-Agent": "Mozilla/5.0 (X11; Linux x86_64)",
+    }
+    if headers:
+        req_headers.update(headers)
+    req = urllib.request.Request(url, headers=req_headers)
+    with urllib.request.urlopen(req, timeout=timeout) as resp:
+        return resp.read().decode("utf-8")
 
 
 def get_current_spec_version(spec_path: Path) -> tuple[str, str | None]:
@@ -148,19 +171,40 @@ def check_package(
     source_label = ""
 
     try:
-        data = fetch_json(pkg.api_url)
-        if pkg.source_type == "updater_api":
-            if isinstance(data, list) and len(data) > 0:
-                first = data[0]
-                latest_ver = str(first["version"])
-                latest_build = str(first.get("execution_id", ""))
-                source_label = "Live Cloud Run Auto-Updater API"
-        elif pkg.source_type == "github_api":
-            if isinstance(data, dict):
-                tag = str(data.get("tag_name", "")).lstrip("v")
-                if tag:
-                    latest_ver = tag
-                    source_label = "GitHub Releases API"
+        if pkg.source_type == "slack_web":
+            html = fetch_text(pkg.api_url)
+            versions = re.findall(r"Slack\s+([0-9]+\.[0-9]+\.[0-9]+)", html)
+            # Slack often pre-publishes release notes hours before the CDN upload completes.
+            # Check the top 5 newest releases with HTTP HEAD; pick the first one that is live on CDN.
+            for v in versions[:5]:
+                rpm_url, _ = pkg.build_urls(v, None)
+                head_req = urllib.request.Request(
+                    rpm_url,
+                    method="HEAD",
+                    headers={"User-Agent": "Mozilla/5.0 (X11; Linux x86_64)"},
+                )
+                try:
+                    with urllib.request.urlopen(head_req, timeout=5) as resp:
+                        if resp.status == 200:
+                            latest_ver = v
+                            source_label = "Slack Release Notes (Live CDN Verified)"
+                            break
+                except (urllib.error.URLError, TimeoutError, OSError):
+                    continue
+        else:
+            data = fetch_json(pkg.api_url)
+            if pkg.source_type == "updater_api":
+                if isinstance(data, list) and len(data) > 0:
+                    first = data[0]
+                    latest_ver = str(first["version"])
+                    latest_build = str(first.get("execution_id", ""))
+                    source_label = "Live Cloud Run Auto-Updater API"
+            elif pkg.source_type == "github_api":
+                if isinstance(data, dict):
+                    tag = str(data.get("tag_name", "")).lstrip("v")
+                    if tag:
+                        latest_ver = tag
+                        source_label = "GitHub Releases API"
     except (
         urllib.error.URLError,
         TimeoutError,
@@ -186,7 +230,14 @@ def check_package(
     if verbose:
         print(f"  └─ Source: {source_label}")
         print(f"  └─ Download x64: {x64_url}")
-        print(f"  └─ Download arm64: {arm_url}")
+        if arm_url != "N/A":
+            print(f"  └─ Download arm64: {arm_url}")
+
+    url_str = (
+        f"  - x86_64: {x64_url}\n  - aarch64: {arm_url}"
+        if arm_url != "N/A"
+        else f"  - x86_64: {x64_url}"
+    )
 
     info: PackageUpdate = {
         "package": pkg.name,
@@ -194,7 +245,7 @@ def check_package(
         "current_version": cur_ver,
         "latest_version": latest_ver,
         "build_id": latest_build,
-        "url": f"  - x86_64: {x64_url}\n  - aarch64: {arm_url}",
+        "url": url_str,
     }
 
     update = info if is_newer(latest_ver, latest_build, cur_ver, cur_build) else None
