@@ -97,7 +97,17 @@ PACKAGES: dict[str, PackageDefinition] = {
 
 
 def run(cmd: list[str], check: bool = True) -> subprocess.CompletedProcess[str]:
-    return subprocess.run(cmd, check=check, capture_output=True, text=True)
+    proc = subprocess.run(cmd, check=False, capture_output=True, text=True)
+    if check and proc.returncode != 0:
+        error_msg = proc.stderr.strip() or proc.stdout.strip()
+        print(
+            f"Command {' '.join(cmd)} failed (code {proc.returncode}): {error_msg}",
+            file=sys.stderr,
+        )
+        raise subprocess.CalledProcessError(
+            proc.returncode, cmd, output=proc.stdout, stderr=proc.stderr
+        )
+    return proc
 
 
 def git(*args: str, check: bool = True) -> subprocess.CompletedProcess[str]:
@@ -164,7 +174,10 @@ def is_newer(
     if v_latest > v_cur:
         return True
     if v_latest == v_cur and latest_build and cur_build:
-        return int(latest_build) > int(cur_build)
+        try:
+            return int(latest_build) > int(cur_build)
+        except ValueError:
+            return latest_build != cur_build
     return False
 
 
@@ -316,13 +329,14 @@ def update_spec_file(
     # Reset Release to 1%{?dist}
     content = re.sub(r"(Release:\s*)[^\n]+", r"\g<1>1%{?dist}", content, count=1)
 
-    # Add changelog entry
-    now = datetime.datetime.now(datetime.UTC).strftime("%a %b %d %Y")
-    log_entry = (
-        f"* {now} Azhar Momin <azhar-momin@outlook.com> - {new_version}-1\n"
-        f"- Upstream release update to {new_version}\n\n"
-    )
-    content = re.sub(r"(%changelog\n)", rf"\g<1>{log_entry}", content, count=1)
+    # Add changelog entry if not already present
+    if f"- {new_version}-1" not in content:
+        now = datetime.datetime.now(datetime.UTC).strftime("%a %b %d %Y")
+        log_entry = (
+            f"* {now} Azhar Momin <azhar-momin@outlook.com> - {new_version}-1\n"
+            f"- Upstream release update to {new_version}\n\n"
+        )
+        content = re.sub(r"(%changelog\n)", rf"\g<1>{log_entry}", content, count=1)
 
     spec_path.write_text(content, encoding="utf-8")
 
@@ -351,11 +365,13 @@ def find_open_pr_for_package(pkg: str) -> dict[str, Any] | None:
             "pr", "list", "--state", "open", "--json", "number,title,headRefName,body"
         )
         prs = json.loads(res.stdout)
-        prefix = f"update/{pkg}-"
         for pr in prs:
             head = pr.get("headRefName", "")
             title = pr.get("title", "")
-            if head.startswith(prefix) or f"({pkg})" in title:
+            if (
+                re.search(rf"^update/{re.escape(pkg)}-v?\d", head)
+                or f"({pkg})" in title
+            ):
                 return pr
     except (subprocess.SubprocessError, json.JSONDecodeError, OSError) as e:
         print(f"Note: Could not query GitHub PRs: {e}", file=sys.stderr)
@@ -385,70 +401,122 @@ def sync_pr_for_update(
 ) -> None:
     pkg = update_info["package"]
     new_ver = update_info["latest_version"]
+    new_build = update_info["build_id"]
+
+    if existing_pr is None:
+        existing_pr = find_open_pr_for_package(pkg)
+
     branch_name = (
         existing_pr["headRefName"] if existing_pr else f"update/{pkg}-{new_ver}"
     )
 
-    git("fetch", "origin", check=False)
+    git("fetch", "--prune", "origin", check=False)
 
+    # If an open PR already exists, check if it's already up-to-date with upstream and origin/master
     if existing_pr:
         pr_number = existing_pr["number"]
+        remote_ref = f"origin/{branch_name}"
+        remote_exists = (
+            git("rev-parse", "--verify", remote_ref, check=False).returncode == 0
+        )
+        is_rebased = (
+            remote_exists
+            and git(
+                "merge-base", "--is-ancestor", "origin/master", remote_ref, check=False
+            ).returncode
+            == 0
+        )
+
+        rel_spec_path = update_info["spec_path"].relative_to(REPO_ROOT)
+        remote_spec = git("show", f"{remote_ref}:{rel_spec_path}", check=False)
+        remote_ver: str | None = None
+        remote_build: str | None = None
+        if remote_spec.returncode == 0:
+            for line in remote_spec.stdout.splitlines():
+                v_match = re.match(r"^Version:\s*([^\s]+)", line)
+                if v_match:
+                    remote_ver = v_match.group(1).strip()
+                b_match = re.match(r"^%global\s+build_id\s+([^\s]+)", line)
+                if b_match:
+                    remote_build = b_match.group(1).strip()
+
+        if is_rebased and remote_ver == new_ver and remote_build == new_build:
+            print(
+                f"[{pkg}] Open PR #{pr_number} on '{branch_name}' is already up-to-date with upstream {new_ver} and origin/master."
+            )
+            return
+
         print(
             f"[{pkg}] Found open PR #{pr_number} on '{branch_name}'. Resetting cleanly from origin/master..."
         )
     else:
         print(f"[{pkg}] Creating branch '{branch_name}' from origin/master...")
 
-    # Always reset the branch cleanly from origin/master to ensure exactly 1 commit
-    git("checkout", "-B", branch_name, "origin/master")
+    try:
+        # Always reset the branch cleanly from origin/master to ensure exactly 1 commit
+        git("checkout", "-B", branch_name, "origin/master")
 
-    # Apply spec and README changes
-    update_spec_file(update_info["spec_path"], new_ver, update_info["build_id"])
-    update_readme_version(pkg, f"{new_ver}-1")
+        # Apply spec and README changes
+        update_spec_file(update_info["spec_path"], new_ver, update_info["build_id"])
+        update_readme_version(pkg, f"{new_ver}-1")
 
-    # Commit and push changes
-    status = git("status", "--porcelain", check=False).stdout.strip()
-    if status:
-        git("add", str(update_info["spec_path"]), "README.md")
-        git("commit", "-m", f"chore({pkg}): bump to {new_ver}")
-        git("push", "--force-with-lease", "-u", "origin", branch_name)
-        print(f"[{pkg}] Pushed updated commit to '{branch_name}'.")
-    else:
-        print(f"[{pkg}] No changes detected after applying updates from origin/master.")
+        # Commit and push changes
+        status = git("status", "--porcelain", check=False).stdout.strip()
+        if status:
+            git("add", str(update_info["spec_path"]), "README.md")
+            git("commit", "-m", f"chore({pkg}): bump to {new_ver}")
+            git("push", "--force-with-lease", "-u", "origin", branch_name)
+            print(f"[{pkg}] Pushed updated commit to '{branch_name}'.")
+        else:
+            print(
+                f"[{pkg}] No changes detected after applying updates from origin/master."
+            )
 
-    # Update or create PR metadata
-    title = f"chore({pkg}): update to {new_ver}"
-    body = (
-        f"Automated update for **{pkg}** to `{new_ver}`.\n\n"
-        f"- Upstream Version: `{new_ver}`\n"
-        f"- Download URLs:\n"
-        f"{update_info['url']}\n\n"
-        f"Review spec changes and merge to trigger Fedora COPR build."
-    )
-
-    if existing_pr:
-        pr_number = existing_pr["number"]
-        try:
-            gh("pr", "edit", str(pr_number), "--title", title, "--body", body)
-            print(f"[{pkg}] Updated PR #{pr_number} metadata.")
-        except (subprocess.SubprocessError, OSError) as e:
-            print(f"[{pkg}] Note: Could not update PR metadata: {e}", file=sys.stderr)
-    elif status:
-        gh(
-            "pr",
-            "create",
-            "--title",
-            title,
-            "--body",
-            body,
-            "--head",
-            branch_name,
-            "--base",
-            "master",
+        # Update or create PR metadata
+        title = f"chore({pkg}): update to {new_ver}"
+        body = (
+            f"Automated update for **{pkg}** to `{new_ver}`.\n\n"
+            f"- Upstream Version: `{new_ver}`\n"
+            f"- Download URLs:\n"
+            f"{update_info['url']}\n\n"
+            f"Review spec changes and merge to trigger Fedora COPR build."
         )
-        print(f"[{pkg}] Created Pull Request for '{branch_name}'.")
 
-    git("checkout", "master")
+        if existing_pr:
+            pr_number = existing_pr["number"]
+            try:
+                gh("pr", "edit", str(pr_number), "--title", title, "--body", body)
+                print(f"[{pkg}] Updated PR #{pr_number} metadata.")
+            except (subprocess.SubprocessError, OSError) as e:
+                print(
+                    f"[{pkg}] Note: Could not update PR metadata: {e}",
+                    file=sys.stderr,
+                )
+        elif status:
+            try:
+                gh(
+                    "pr",
+                    "create",
+                    "--title",
+                    title,
+                    "--body",
+                    body,
+                    "--head",
+                    branch_name,
+                    "--base",
+                    "master",
+                )
+                print(f"[{pkg}] Created Pull Request for '{branch_name}'.")
+            except subprocess.CalledProcessError as e:
+                if "already exists" in (e.stderr or "").lower():
+                    print(
+                        f"[{pkg}] Pull Request already exists for '{branch_name}'.",
+                        file=sys.stderr,
+                    )
+                else:
+                    raise
+    finally:
+        git("checkout", "-f", "master", check=False)
 
 
 # --- Main Entrypoint ---
@@ -502,7 +570,9 @@ def main() -> None:
             sys.exit(1)
         target_pkg = None
         for p in PACKAGES:
-            if p in pr.get("headRefName", "") or f"({p})" in pr.get("title", ""):
+            head = pr.get("headRefName", "")
+            title = pr.get("title", "")
+            if re.search(rf"^update/{re.escape(p)}-v?\d", head) or f"({p})" in title:
                 target_pkg = p
                 break
         if not target_pkg or target_pkg not in latest_info:
