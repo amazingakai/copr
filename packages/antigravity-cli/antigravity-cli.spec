@@ -1,6 +1,6 @@
 Name:           antigravity-cli
-Version:        1.5.3
-Release:        2%{?dist}
+Version:        1.5.4
+Release:        1%{?dist}
 Summary:        Command-line interface for Google Antigravity
 
 License:        LicenseRef-Google-Antigravity
@@ -61,6 +61,9 @@ ln -sf agy %{buildroot}%{_bindir}/antigravity-cli
 %{_libexecdir}/antigravity-cli/agy
 
 %changelog
+* Tue Nov 10 2026 Azhar Momin <azhar-momin@outlook.com> - 1.5.4-1
+- Upstream release update to 1.5.4
+
 * Sat Nov 07 2026 Azhar Momin <azhar-momin@outlook.com> - 1.5.3-2
 - Add support for aarch64 (ARM64) architecture
 
