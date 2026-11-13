@@ -1,5 +1,5 @@
 Name:           slack
-Version:        4.53.283
+Version:        4.53.287
 Release:        1%{?dist}
 Summary:        Slack Desktop Client for Linux
 
@@ -83,6 +83,9 @@ appstream-util validate-relax --nonet %{buildroot}%{_datadir}/metainfo/slack.met
 %{_datadir}/icons/hicolor/512x512/apps/slack.png
 
 %changelog
+* Fri Nov 13 2026 Azhar Momin <azhar-momin@outlook.com> - 4.53.287-1
+- Upstream release update to 4.53.287
+
 * Mon Nov 09 2026 Azhar Momin <azhar-momin@outlook.com> - 4.53.283-1
 - Upstream release update to 4.53.283
 
