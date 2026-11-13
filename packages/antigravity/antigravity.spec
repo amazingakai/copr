@@ -1,6 +1,6 @@
 Name:           antigravity
-Version:        2.31.2
-%global build_id 6470801290035200
+Version:        2.32.0
+%global build_id 6141816156848128
 Release:        1%{?dist}
 Summary:        Google Antigravity Desktop Client
 
@@ -105,6 +105,9 @@ appstream-util validate-relax --nonet %{buildroot}%{_datadir}/metainfo/antigravi
 %{_datadir}/icons/hicolor/512x512/apps/antigravity.png
 
 %changelog
+* Fri Nov 13 2026 Azhar Momin <azhar-momin@outlook.com> - 2.32.0-1
+- Upstream release update to 2.32.0
+
 * Thu Nov 12 2026 Azhar Momin <azhar-momin@outlook.com> - 2.31.2-1
 - Upstream release update to 2.31.2
 
