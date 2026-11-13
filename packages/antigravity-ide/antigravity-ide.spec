@@ -1,7 +1,7 @@
 Name:           antigravity-ide
-Version:        2.6.0
-%global build_id 5526304964083712
-Release:        2%{?dist}
+Version:        2.7.0
+%global build_id 4507555968450560
+Release:        1%{?dist}
 Summary:        Google Antigravity Standalone IDE
 
 License:        LicenseRef-Google-Antigravity
@@ -109,6 +109,9 @@ appstream-util validate-relax --nonet %{buildroot}%{_datadir}/metainfo/antigravi
 %{_datadir}/zsh/site-functions/_antigravity-ide
 
 %changelog
+* Thu Nov 12 2026 Azhar Momin <azhar-momin@outlook.com> - 2.7.0-1
+- Upstream release update to 2.7.0
+
 * Sat Nov 07 2026 Azhar Momin <azhar-momin@outlook.com> - 2.6.0-2
 - Add support for aarch64 (ARM64) architecture
 
