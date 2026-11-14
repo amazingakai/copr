@@ -11,8 +11,6 @@ on:
     branches:
       - master
       - main
-    paths:
-      - "packages/**"
   workflow_dispatch:
     inputs:
       package:
@@ -158,3 +156,28 @@ jobs:
 
           echo "Submitting ${SRPM} to COPR project: ${COPR_PROJECT}..."
           copr-cli build --nowait "${COPR_PROJECT}" "${SRPM}"
+
+  ci-success:
+    name: ci-success
+    needs:
+      - determine-packages
+      - build-and-submit
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify all prior jobs passed
+        run: |
+          echo "determine-packages result: ${{ needs.determine-packages.result }}"
+          echo "build-and-submit result: ${{ needs.build-and-submit.result }}"
+
+          if [ "${{ needs.determine-packages.result }}" != "success" ]; then
+            echo "::error::determine-packages did not succeed (status: ${{ needs.determine-packages.result }})."
+            exit 1
+          fi
+
+          if [ "${{ needs.build-and-submit.result }}" = "failure" ] || [ "${{ needs.build-and-submit.result }}" = "cancelled" ]; then
+            echo "::error::build-and-submit failed or was cancelled (status: ${{ needs.build-and-submit.result }})."
+            exit 1
+          fi
+
+          echo "✅ All required CI checks passed successfully."
