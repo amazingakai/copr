@@ -38,6 +38,12 @@ sudo dnf install -y slack
 
 # Zoom Workplace
 sudo dnf install -y zoom
+
+# Claude Desktop
+sudo dnf install -y claude-desktop
+
+# Claude Code CLI
+sudo dnf install -y claude-code
 ```
 
 ---
@@ -51,9 +57,11 @@ sudo dnf install -y zoom
 | **`antigravity-cli`** | `agy`             | `1.5.10-1`      | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/antigravity-cli/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/antigravity-cli/) | Google Antigravity CLI terminal interface |
 | **`slack`**           | `slack`           | `4.53.287-1`   | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/slack/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/slack/)                     | Slack Desktop Client                      |
 | **`zoom`**            | `zoom`            | `7.2.5.6661-1` | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/zoom/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/zoom/)                       | Zoom Workplace Video Conferencing         |
+| **`claude-desktop`**  | `claude-desktop`  | `5.11492.5-1`  | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/claude-desktop/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/claude-desktop/) | Claude Desktop Application & Code Agent   |
+| **`claude-code`**     | `claude`          | `2.1.327-1`    | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/claude-code/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/claude-code/)       | Claude Code Terminal Agent CLI            |
 
 ---
 
 ## License
 
-This packaging repository and automation scripts are licensed under the [MIT License](LICENSE). Google Antigravity, Antigravity IDE, `agy`, Slack, and Zoom binaries are subject to their respective terms of service and software licenses.
+This packaging repository and automation scripts are licensed under the [MIT License](LICENSE). Google Antigravity, Antigravity IDE, `agy`, Slack, Zoom, Claude Desktop, and Claude Code binaries are subject to their respective terms of service and software licenses.

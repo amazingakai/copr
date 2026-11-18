@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>com.anthropic.Claude</id>
+  <metadata_license>MIT</metadata_license>
+  <project_license>LicenseRef-proprietary</project_license>
+  <name>Claude</name>
+  <summary>Desktop application for Claude with Code agent and MCP</summary>
+  <description>
+    <p>
+      Claude Desktop brings the intelligence of Anthropic's Claude models directly
+      to your desktop with deep developer workflows, Model Context Protocol (MCP)
+      connectors, and native agentic coding capabilities.
+    </p>
+    <p>
+      The integrated Code tab allows you to run parallel autonomous coding sessions
+      with Git isolation, visual side-by-side diff reviews, live app browser previews,
+      and integrated terminal execution.
+    </p>
+  </description>
+  <launchable type="desktop-id">com.anthropic.Claude.desktop</launchable>
+  <url type="homepage">https://claude.ai</url>
+  <url type="help">https://code.claude.com/docs/en/desktop</url>
+  <developer id="com.anthropic">
+    <name>Anthropic PBC</name>
+  </developer>
+  <categories>
+    <category>Development</category>
+    <category>Utility</category>
+  </categories>
+  <content_rating type="oars-1.1" />
+  <provides>
+    <binary>claude-desktop</binary>
+    <id>com.anthropic.Claude.desktop</id>
+  </provides>
+</component>

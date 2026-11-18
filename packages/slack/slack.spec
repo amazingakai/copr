@@ -35,7 +35,7 @@ rpm2cpio %{SOURCE0} | cpio -idmv
 
 # Fix upstream AppStream metadata specification compliance in-place
 sed -i 's|www.slack.com|https://slack.com|g' usr/share/metainfo/slack.metainfo.xml
-sed -i '/<component/a \ \ \ \ <metadata_license>CC0-1.0</metadata_license>' usr/share/metainfo/slack.metainfo.xml
+sed -i '/<component/a \ \ \ \ <metadata_license>MIT</metadata_license>' usr/share/metainfo/slack.metainfo.xml
 
 %build
 # Pre-compiled binary release; no compilation needed

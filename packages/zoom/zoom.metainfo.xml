@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop-application">
   <id>us.zoom.Zoom</id>
-  <metadata_license>CC0-1.0</metadata_license>
+  <metadata_license>MIT</metadata_license>
   <project_license>LicenseRef-proprietary</project_license>
   <name>Zoom Workplace</name>
   <summary>Video conferencing, web conferencing, webinars, and screen sharing</summary>

@@ -25,6 +25,8 @@ on:
           - antigravity-cli
           - slack
           - zoom
+          - claude-desktop
+          - claude-code
 
 jobs:
   determine-packages:
@@ -89,7 +91,9 @@ jobs:
             python3 \
             jq \
             copr-cli \
-            git
+            git \
+            binutils \
+            zstd
 
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1

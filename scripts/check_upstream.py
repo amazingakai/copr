@@ -90,6 +90,24 @@ PACKAGES: dict[str, PackageDefinition] = {
             "N/A",
         ),
     ),
+    "claude-desktop": PackageDefinition(
+        name="claude-desktop",
+        source_type="claude_desktop_apt",
+        api_url="https://downloads.claude.ai/claude-desktop/apt/stable/dists/stable/main/binary-amd64/Packages",
+        build_urls=lambda v, _: (
+            f"https://downloads.claude.ai/claude-desktop/apt/stable/pool/main/c/claude-desktop/claude-desktop_{v}_amd64.deb",
+            "N/A",
+        ),
+    ),
+    "claude-code": PackageDefinition(
+        name="claude-code",
+        source_type="claude_code_version",
+        api_url="https://downloads.claude.ai/claude-code-releases/latest",
+        build_urls=lambda v, _: (
+            f"https://downloads.claude.ai/claude-code-releases/{v}/linux-x64/claude.zst",
+            f"https://downloads.claude.ai/claude-code-releases/{v}/linux-arm64/claude.zst",
+        ),
+    ),
 }
 
 
@@ -235,6 +253,17 @@ def check_package(
             if m:
                 latest_ver = m.group(1)
                 source_label = "Zoom CDN Redirect"
+        elif pkg.source_type == "claude_code_version":
+            text = fetch_text(pkg.api_url).strip()
+            if text:
+                latest_ver = text
+                source_label = "Anthropic Claude Code Release Endpoint"
+        elif pkg.source_type == "claude_desktop_apt":
+            pkg_data = fetch_text(pkg.api_url)
+            versions = re.findall(r"(?:^|\n)Version:\s+([0-9.]+)", pkg_data)
+            if versions:
+                latest_ver = max(versions, key=parse_version)
+                source_label = "Anthropic Claude Desktop APT Feed"
         else:
             data = fetch_json(pkg.api_url)
             if pkg.source_type == "updater_api":
