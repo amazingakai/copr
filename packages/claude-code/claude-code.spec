@@ -1,5 +1,5 @@
 Name:           claude-code
-Version:        2.1.327
+Version:        2.1.328
 Release:        1%{?dist}
 Summary:        Claude Code - Agentic coding assistant for your terminal
 
@@ -51,6 +51,9 @@ ln -sf claude %{buildroot}%{_bindir}/claude-code
 %{_bindir}/claude-code
 
 %changelog
+* Thu Nov 19 2026 Azhar Momin <azhar-momin@outlook.com> - 2.1.328-1
+- Upstream release update to 2.1.328
+
 * Wed Nov 18 2026 Azhar Momin <azhar-momin@outlook.com> - 2.1.327-1
 - Initial Fedora RPM packaging for Claude Code 2.1.327
 - Standalone native binary release with x86_64 and aarch64 support
