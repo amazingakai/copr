@@ -1,15 +1,17 @@
 Name:           claude-desktop
 Version:        5.11492.5
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Claude Desktop - Desktop application for Claude with Code agent and MCP
 
 License:        Proprietary
 URL:            https://claude.ai
 Source0:        https://downloads.claude.ai/claude-desktop/apt/stable/pool/main/c/claude-desktop/claude-desktop_%{version}_amd64.deb
 Source1:        com.anthropic.Claude.metainfo.xml
+Source2:        patch-titlebar.py
 
 ExclusiveArch:  x86_64
 
+BuildRequires:  python3
 BuildRequires:  binutils
 BuildRequires:  tar
 BuildRequires:  xz
@@ -38,6 +40,9 @@ previews, and Model Context Protocol (MCP) integration.
 %setup -q -c -T -n claude-desktop-%{version}
 ar -x %{SOURCE0}
 tar -xf data.tar.xz
+
+# Patch app.asar to disable titleBarOverlay on Linux/KDE
+python3 %{SOURCE2} usr/lib/claude-desktop/resources/app.asar
 
 %build
 # Pre-compiled binary release; no compilation needed
@@ -81,6 +86,9 @@ appstream-util validate-relax --nonet %{buildroot}%{_datadir}/metainfo/com.anthr
 %{_datadir}/icons/hicolor/*/apps/claude-desktop.png
 
 %changelog
+* Thu Nov 19 2026 Azhar Momin <azhar-momin@outlook.com> - 5.11492.5-2
+- Patch app.asar to disable titleBarOverlay on Linux/KDE
+
 * Wed Nov 18 2026 Azhar Momin <azhar-momin@outlook.com> - 5.11492.5-1
 - Initial Fedora RPM packaging for Claude Desktop 5.11492.5
 - Repackage official Linux x86_64 Debian release from Anthropic
