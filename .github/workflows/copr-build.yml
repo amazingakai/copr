@@ -27,6 +27,7 @@ on:
           - zoom
           - claude-desktop
           - claude-code
+          - orca-ide
 
 jobs:
   determine-packages:

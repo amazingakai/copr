@@ -44,6 +44,9 @@ sudo dnf install -y claude-desktop
 
 # Claude Code CLI
 sudo dnf install -y claude-code
+
+# Orca IDE
+sudo dnf install -y orca-ide
 ```
 
 ---
@@ -59,9 +62,10 @@ sudo dnf install -y claude-code
 | **`zoom`**            | `zoom`            | `7.2.5.6661-1` | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/zoom/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/zoom/)                       | Zoom Workplace Video Conferencing         |
 | **`claude-desktop`**  | `claude-desktop`  | `5.11492.5-2`  | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/claude-desktop/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/claude-desktop/) | Claude Desktop Application & Code Agent   |
 | **`claude-code`**     | `claude`          | `2.1.329-1`    | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/claude-code/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/claude-code/)       | Claude Code Terminal Agent CLI            |
+| **`orca-ide`**        | `orca-ide`        | `1.4.266-1`    | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/orca-ide/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/orca-ide/)         | Next-gen IDE for Parallel Agentic Dev     |
 
 ---
 
 ## License
 
-This packaging repository and automation scripts are licensed under the [MIT License](LICENSE). Google Antigravity, Antigravity IDE, `agy`, Slack, Zoom, Claude Desktop, and Claude Code binaries are subject to their respective terms of service and software licenses.
+This packaging repository and automation scripts are licensed under the [MIT License](LICENSE). Google Antigravity, Antigravity IDE, `agy`, Slack, Zoom, Claude Desktop, Claude Code, and Orca binaries are subject to their respective terms of service and software licenses.

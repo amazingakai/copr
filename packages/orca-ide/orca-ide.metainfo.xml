@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>com.stablyai.orca</id>
+  <metadata_license>MIT</metadata_license>
+  <project_license>MIT</project_license>
+  <name>Orca</name>
+  <summary>Next-gen IDE for parallel agentic development</summary>
+  <description>
+    <p>
+      Orca is an agentic development environment designed for running parallel autonomous
+      coding sessions, managing Git worktrees, and orchestrating AI developer agents.
+    </p>
+    <p>
+      Features include deep Model Context Protocol (MCP) and agent integration, built-in
+      browser testing, parallel terminal workflows, and unified review interfaces.
+    </p>
+  </description>
+  <launchable type="desktop-id">orca-ide.desktop</launchable>
+  <url type="homepage">https://github.com/stablyai/orca</url>
+  <url type="bugtracker">https://github.com/stablyai/orca/issues</url>
+  <developer id="com.stablyai">
+    <name>Stably AI</name>
+  </developer>
+  <categories>
+    <category>Development</category>
+    <category>IDE</category>
+  </categories>
+  <content_rating type="oars-1.1" />
+  <provides>
+    <binary>orca-ide</binary>
+    <id>orca-ide.desktop</id>
+  </provides>
+</component>

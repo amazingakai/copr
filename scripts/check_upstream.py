@@ -108,6 +108,15 @@ PACKAGES: dict[str, PackageDefinition] = {
             f"https://downloads.claude.ai/claude-code-releases/{v}/linux-arm64/claude.zst",
         ),
     ),
+    "orca-ide": PackageDefinition(
+        name="orca-ide",
+        source_type="github_api",
+        api_url="https://api.github.com/repos/stablyai/orca/releases/latest",
+        build_urls=lambda v, _: (
+            f"https://github.com/stablyai/orca/releases/download/v{v}/orca-ide-{v}.x86_64.rpm",
+            f"https://github.com/stablyai/orca/releases/download/v{v}/orca-ide-{v}.aarch64.rpm",
+        ),
+    ),
 }
 
 
