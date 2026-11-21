@@ -1,6 +1,6 @@
 Name:           orca-ide
 Version:        1.4.266
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Next-gen IDE for parallel agentic development
 
 License:        MIT
@@ -22,8 +22,9 @@ Requires:       xdg-utils
 %define __strip /bin/true
 %define _build_id_links none
 
-# Filter private bundled shared libraries and bundled node script shebangs
-%global __requires_exclude ^(libffmpeg|libvk_swiftshader|libvulkan|libEGL|libGLESv2|libggml.*)\.so.*$|^/usr/bin/node$
+# Filter private bundled shared libraries and internal resources
+%global __requires_exclude_from ^/opt/Orca/resources/.*$
+%global __requires_exclude ^(libffmpeg|libvk_swiftshader|libvulkan|libEGL|libGLESv2)\.so.*$
 %global __provides_exclude_from ^/opt/Orca/.*$
 
 %description
@@ -52,6 +53,15 @@ rm -rf %{buildroot}
 # Install application directory
 mkdir -p %{buildroot}/opt/Orca
 cp -a opt/Orca/. %{buildroot}/opt/Orca/
+
+# Remove bundled non-Linux and cross-architecture ripgrep binaries
+rm -rf %{buildroot}/opt/Orca/resources/ripgrep/darwin-*
+rm -rf %{buildroot}/opt/Orca/resources/ripgrep/win32-*
+%ifarch x86_64
+rm -rf %{buildroot}/opt/Orca/resources/ripgrep/linux-arm64
+%elifarch aarch64
+rm -rf %{buildroot}/opt/Orca/resources/ripgrep/linux-x64
+%endif
 
 # Set executable and chrome-sandbox permissions
 chmod 755 %{buildroot}/opt/Orca/orca-ide
@@ -93,6 +103,10 @@ appstream-util validate-relax --nonet %{buildroot}%{_datadir}/metainfo/orca-ide.
 %{_datadir}/icons/hicolor/*/apps/orca-ide.png
 
 %changelog
+* Sat Nov 21 2026 Azhar Momin <azhar-momin@outlook.com> - 1.4.266-2
+- Filter internal resources and foreign architecture dependencies (aarch64, musl, glibc symbols)
+- Remove bundled non-Linux and cross-architecture ripgrep binaries
+
 * Fri Nov 20 2026 Azhar Momin <azhar-momin@outlook.com> - 1.4.266-1
 - Initial Fedora RPM packaging for Orca IDE 1.4.266
 - Repackage official Linux x86_64 and aarch64 releases from Stably AI
