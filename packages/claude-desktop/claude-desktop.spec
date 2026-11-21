@@ -1,5 +1,5 @@
 Name:           claude-desktop
-Version:        6.28899.2
+Version:        6.28899.6
 Release:        1%{?dist}
 Summary:        Claude Desktop - Desktop application for Claude with Code agent and MCP
 
@@ -86,6 +86,9 @@ appstream-util validate-relax --nonet %{buildroot}%{_datadir}/metainfo/com.anthr
 %{_datadir}/icons/hicolor/*/apps/claude-desktop.png
 
 %changelog
+* Sat Nov 21 2026 Azhar Momin <azhar-momin@outlook.com> - 6.28899.6-1
+- Upstream release update to 6.28899.6
+
 * Sat Nov 21 2026 Azhar Momin <azhar-momin@outlook.com> - 6.28899.2-1
 - Upstream release update to 6.28899.2
 
