@@ -62,7 +62,7 @@ sudo dnf install -y orca-ide
 | **`zoom`**            | `zoom`            | `7.2.5.6661-1` | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/zoom/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/zoom/)                       | Zoom Workplace Video Conferencing         |
 | **`claude-desktop`**  | `claude-desktop`  | `6.28899.6-1`  | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/claude-desktop/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/claude-desktop/) | Claude Desktop Application & Code Agent   |
 | **`claude-code`**     | `claude`          | `2.1.330-1`    | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/claude-code/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/claude-code/)       | Claude Code Terminal Agent CLI            |
-| **`orca-ide`**        | `orca-ide`        | `1.4.268-1`    | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/orca-ide/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/orca-ide/)         | Next-gen IDE for Parallel Agentic Dev     |
+| **`orca-ide`**        | `orca-ide`        | `1.4.269-1`    | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/orca-ide/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/orca-ide/)         | Next-gen IDE for Parallel Agentic Dev     |
 
 ---
 
