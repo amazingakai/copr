@@ -94,7 +94,11 @@ jobs:
             copr-cli \
             git \
             binutils \
-            zstd
+            zstd \
+            tar \
+            xz \
+            diffutils \
+            file
 
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -135,16 +139,30 @@ jobs:
           echo "Downloading remote Source archives..."
           spectool -g -C ~/rpmbuild/SOURCES/ ~/rpmbuild/SPECS/${PKG}.spec
 
-      - name: Test prep stage and verify patch applies cleanly
+      - name: Build Binary RPM and Source RPM
         run: |
           PKG="${{ matrix.package }}"
-          echo "Testing %prep stage for ${PKG}..."
-          rpmbuild -bp --nodeps ~/rpmbuild/SPECS/${PKG}.spec
+          echo "Building binary and source RPM for ${PKG}..."
+          rpmbuild -ba ~/rpmbuild/SPECS/${PKG}.spec
 
-      - name: Build Source RPM (SRPM)
+      - name: Test RPM installation & dependency resolution
         run: |
           PKG="${{ matrix.package }}"
-          rpmbuild -bs --nodeps ~/rpmbuild/SPECS/${PKG}.spec
+          echo "Verifying dependency resolution and installing ${PKG}..."
+          dnf install -y --nogpgcheck ~/rpmbuild/RPMS/*/${PKG}-*.rpm
+
+      - name: Verify installed binary entrypoint
+        run: |
+          PKG="${{ matrix.package }}"
+          echo "Checking installed binaries for ${PKG}..."
+          rpm -ql "${PKG}" | grep "^/usr/bin/" | while read -r bin; do
+            if [ -x "$bin" ] || [ -L "$bin" ]; then
+              echo "✅ Verified executable: $bin"
+            else
+              echo "::error::Binary $bin is not executable!"
+              exit 1
+            fi
+          done
 
       - name: Submit SRPM to Fedora COPR
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
