@@ -482,6 +482,10 @@ def sync_pr_for_update(
             print(
                 f"[{pkg}] Open PR #{pr_number} on '{branch_name}' is already up-to-date with upstream {new_ver} and origin/master."
             )
+            try:
+                gh("pr", "merge", str(pr_number), "--auto", "--squash")
+            except (subprocess.SubprocessError, OSError):
+                pass
             return
 
         print(
@@ -530,9 +534,17 @@ def sync_pr_for_update(
                     f"[{pkg}] Note: Could not update PR metadata: {e}",
                     file=sys.stderr,
                 )
+            try:
+                gh("pr", "merge", str(pr_number), "--auto", "--squash")
+                print(f"[{pkg}] Configured auto-merge for PR #{pr_number}.")
+            except (subprocess.SubprocessError, OSError) as e:
+                print(
+                    f"[{pkg}] Note: Could not enable auto-merge on PR #{pr_number}: {e}",
+                    file=sys.stderr,
+                )
         elif status:
             try:
-                gh(
+                create_res = gh(
                     "pr",
                     "create",
                     "--title",
@@ -545,6 +557,15 @@ def sync_pr_for_update(
                     "master",
                 )
                 print(f"[{pkg}] Created Pull Request for '{branch_name}'.")
+                try:
+                    pr_url = create_res.stdout.strip()
+                    gh("pr", "merge", pr_url, "--auto", "--squash")
+                    print(f"[{pkg}] Configured auto-merge for '{branch_name}'.")
+                except (subprocess.SubprocessError, OSError) as e:
+                    print(
+                        f"[{pkg}] Note: Could not enable auto-merge: {e}",
+                        file=sys.stderr,
+                    )
             except subprocess.CalledProcessError as e:
                 if "already exists" in (e.stderr or "").lower():
                     print(
@@ -663,18 +684,30 @@ def main() -> None:
         else:
             print(f"[{pkg}] Up to date.")
 
-    if not updates:
-        print("All packages are currently up-to-date with upstream.")
-        return
-
     if args.dry_run:
         print("[dry-run] Check completed. No files modified.")
         return
 
-    for up in updates:
-        if args.create_pr:
-            sync_pr_for_update(up)
-        else:
+    if args.create_pr:
+        # First, ensure any existing open PRs are up to date and rebased against origin/master
+        for p, info in latest_info.items():
+            open_pr = find_open_pr_for_package(p)
+            if open_pr:
+                print(
+                    f"Checking open PR #{open_pr['number']} for '{p}' to ensure it is rebased against origin/master..."
+                )
+                sync_pr_for_update(info, existing_pr=open_pr)
+
+        # Then, create PRs for packages that have updates and don't yet have an open PR
+        for up in updates:
+            open_pr = find_open_pr_for_package(up["package"])
+            if not open_pr:
+                sync_pr_for_update(up)
+    else:
+        if not updates:
+            print("All packages are currently up-to-date with upstream.")
+            return
+        for up in updates:
             update_spec_file(up["spec_path"], up["latest_version"], up["build_id"])
             update_readme_version(up["package"], f"{up['latest_version']}-1")
             print(f"Updated spec file: {up['spec_path']}")
