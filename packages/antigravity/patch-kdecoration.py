@@ -11,6 +11,7 @@ preserving exact byte offsets and lengths.
 import hashlib
 import json
 import os
+import re
 import struct
 import sys
 
@@ -80,31 +81,38 @@ def patch_asar(asar_path: str) -> None:
 
     utils_bytes = content[u_offset : u_offset + u_size]
 
-    target = (
-        b"        titleBarOverlay: isMacOS()\n"
-        b"            ? false\n"
-        b"            : {\n"
-        b"                color: backgroundColor,\n"
-        b"                symbolColor: foregroundColor,\n"
-        b"                height: 30,\n"
-        b"            },"
-    )
+    # Check if already patched
+    if b"titleBarOverlay: false, /*" in utils_bytes:
+        print(f"Already patched: titleBarOverlay is already disabled in {asar_path}")
+        return
 
-    # Pad with spaces inside a JS comment to keep the exact length (199 bytes)
-    replacement = b"        titleBarOverlay: false, /*" + b" " * 163 + b"*/"
-    assert len(target) == len(replacement), (
-        f"Length mismatch: {len(target)} != {len(replacement)}"
-    )
+    pattern = rb"(        titleBarOverlay:\s*isMacOS\(\)\s*\?\s*false\s*:\s*\{[^}]+\},)"
+    matches = list(re.finditer(pattern, utils_bytes))
 
-    if target not in utils_bytes:
+    if not matches:
         print(
             "Warning/Error: Target string not found in utils.js. May already be patched or upstream changed.",
             file=sys.stderr,
         )
         sys.exit(1)
 
-    idx = utils_bytes.find(target)
-    new_utils_bytes = utils_bytes[:idx] + replacement + utils_bytes[idx + len(target) :]
+    m = matches[0]
+    target = m.group(1)
+    start, end = m.span(1)
+
+    # Pad with spaces inside a JS comment to keep the exact byte length
+    prefix = b"        titleBarOverlay: false, /*"
+    suffix = b"*/"
+    pad_len = len(target) - len(prefix) - len(suffix)
+    assert pad_len >= 0, (
+        f"Target too short ({len(target)} bytes) for replacement comment"
+    )
+    replacement = prefix + b" " * pad_len + suffix
+    assert len(target) == len(replacement), (
+        f"Length mismatch: {len(target)} != {len(replacement)}"
+    )
+
+    new_utils_bytes = utils_bytes[:start] + replacement + utils_bytes[end:]
 
     # Compute new SHA-256 block hash
     new_hash = hashlib.sha256(new_utils_bytes).hexdigest()

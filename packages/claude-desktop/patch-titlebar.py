@@ -61,31 +61,46 @@ def patch_asar(asar_path: str) -> None:
         .get("build", {})
         .get("files", {})
     )
-    target = b'titleBarStyle:"hidden",titleBarOverlay:!0'
-    replacement = b'titleBarStyle:"hidden",titleBarOverlay:!1'
-    assert len(target) == len(replacement), (
-        f"Length mismatch: {len(target)} != {len(replacement)}"
-    )
+    targets = [
+        (
+            b'titleBarStyle:"hidden",titleBarOverlay:!0',
+            b'titleBarStyle:"hidden",titleBarOverlay:!1',
+        ),
+        (b"titleBarOverlay:!0", b"titleBarOverlay:!1"),
+    ]
 
     target_chunk: str | None = None
     target_info: dict[str, Any] | None = None
+    active_target: bytes | None = None
+    active_replacement: bytes | None = None
+
     for fname, finfo in files.items():
         if fname.startswith("index.chunk-") and fname.endswith(".js"):
             off = data_offset + int(finfo["offset"])
             sz = int(finfo["size"])
             chunk_bytes = content[off : off + sz]
-            if target in chunk_bytes:
-                target_chunk = fname
-                target_info = finfo
+            for t, r in targets:
+                if t in chunk_bytes:
+                    target_chunk = fname
+                    target_info = finfo
+                    active_target = t
+                    active_replacement = r
+                    break
+            if target_chunk:
                 break
 
-    if not target_chunk or not target_info:
+    if (
+        not target_chunk
+        or not target_info
+        or not active_target
+        or not active_replacement
+    ):
         # Check if already patched
         for fname, finfo in files.items():
             if fname.startswith("index.chunk-") and fname.endswith(".js"):
                 off = data_offset + int(finfo["offset"])
                 sz = int(finfo["size"])
-                if replacement in content[off : off + sz]:
+                if b"titleBarOverlay:!1" in content[off : off + sz]:
                     print(
                         f"Already patched: titleBarOverlay is already set to false in {fname}"
                     )
@@ -101,7 +116,7 @@ def patch_asar(asar_path: str) -> None:
     chunk_sz = int(target_info["size"])
     chunk_bytes = content[chunk_off : chunk_off + chunk_sz]
 
-    new_chunk_bytes = chunk_bytes.replace(target, replacement, 1)
+    new_chunk_bytes = chunk_bytes.replace(active_target, active_replacement, 1)
     new_integrity = compute_integrity(new_chunk_bytes)
     old_integrity: dict[str, Any] = target_info["integrity"]
 
@@ -138,7 +153,7 @@ def patch_asar(asar_path: str) -> None:
         f.write(content)
 
     print(f"Successfully patched {asar_path}")
-    print(f"  Target: {target.decode('utf-8')} -> {replacement.decode('utf-8')}")
+    print(f"  Target: {active_target.decode('utf-8')} -> {active_replacement.decode('utf-8')}")
     print(f"  Old SHA256: {old_integrity['hash']}")
     print(f"  New SHA256: {new_integrity['hash']}")
 
