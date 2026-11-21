@@ -1,5 +1,5 @@
 Name:           orca-ide
-Version:        1.4.266
+Version:        1.4.268
 Release:        1%{?dist}
 Summary:        Next-gen IDE for parallel agentic development
 
@@ -93,6 +93,9 @@ appstream-util validate-relax --nonet %{buildroot}%{_datadir}/metainfo/orca-ide.
 %{_datadir}/icons/hicolor/*/apps/orca-ide.png
 
 %changelog
+* Sat Nov 21 2026 Azhar Momin <azhar-momin@outlook.com> - 1.4.268-1
+- Upstream release update to 1.4.268
+
 * Fri Nov 20 2026 Azhar Momin <azhar-momin@outlook.com> - 1.4.266-1
 - Initial Fedora RPM packaging for Orca IDE 1.4.266
 - Repackage official Linux x86_64 and aarch64 releases from Stably AI
