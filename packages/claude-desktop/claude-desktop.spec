@@ -1,6 +1,6 @@
 Name:           claude-desktop
-Version:        5.11492.5
-Release:        2%{?dist}
+Version:        6.28899.2
+Release:        1%{?dist}
 Summary:        Claude Desktop - Desktop application for Claude with Code agent and MCP
 
 License:        Proprietary
@@ -86,6 +86,9 @@ appstream-util validate-relax --nonet %{buildroot}%{_datadir}/metainfo/com.anthr
 %{_datadir}/icons/hicolor/*/apps/claude-desktop.png
 
 %changelog
+* Sat Nov 21 2026 Azhar Momin <azhar-momin@outlook.com> - 6.28899.2-1
+- Upstream release update to 6.28899.2
+
 * Thu Nov 19 2026 Azhar Momin <azhar-momin@outlook.com> - 5.11492.5-2
 - Patch app.asar to disable titleBarOverlay on Linux/KDE
 
