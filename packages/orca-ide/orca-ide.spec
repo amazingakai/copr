@@ -1,6 +1,6 @@
 Name:           orca-ide
-Version:        1.4.266
-Release:        2%{?dist}
+Version:        1.4.268
+Release:        1%{?dist}
 Summary:        Next-gen IDE for parallel agentic development
 
 License:        MIT
@@ -103,6 +103,9 @@ appstream-util validate-relax --nonet %{buildroot}%{_datadir}/metainfo/orca-ide.
 %{_datadir}/icons/hicolor/*/apps/orca-ide.png
 
 %changelog
+* Sat Nov 21 2026 Azhar Momin <azhar-momin@outlook.com> - 1.4.268-1
+- Upstream release update to 1.4.268
+
 * Sat Nov 21 2026 Azhar Momin <azhar-momin@outlook.com> - 1.4.266-2
 - Filter internal resources and foreign architecture dependencies (aarch64, musl, glibc symbols)
 - Remove bundled non-Linux and cross-architecture ripgrep binaries
