@@ -117,6 +117,33 @@ PACKAGES: dict[str, PackageDefinition] = {
             f"https://github.com/stablyai/orca/releases/download/v{v}/orca-ide-{v}.aarch64.rpm",
         ),
     ),
+    "opencode": PackageDefinition(
+        name="opencode",
+        source_type="github_api",
+        api_url="https://api.github.com/repos/anomalyco/opencode/releases",
+        build_urls=lambda v, _: (
+            f"https://github.com/anomalyco/opencode/releases/download/v{v}/opencode-linux-x64.tar.gz",
+            f"https://github.com/anomalyco/opencode/releases/download/v{v}/opencode-linux-arm64.tar.gz",
+        ),
+    ),
+    "opencode-desktop": PackageDefinition(
+        name="opencode-desktop",
+        source_type="github_api",
+        api_url="https://api.github.com/repos/anomalyco/opencode/releases",
+        build_urls=lambda v, _: (
+            f"https://github.com/anomalyco/opencode/releases/download/v{v}/opencode-desktop-linux-amd64.deb",
+            f"https://github.com/anomalyco/opencode/releases/download/v{v}/opencode-desktop-linux-arm64.deb",
+        ),
+    ),
+    "t3code": PackageDefinition(
+        name="t3code",
+        source_type="github_api",
+        api_url="https://api.github.com/repos/pingdotgg/t3code/releases/latest",
+        build_urls=lambda v, _: (
+            f"https://github.com/pingdotgg/t3code/releases/download/v{v}/T3-Code-{v}-amd64.deb",
+            f"https://github.com/pingdotgg/t3code/releases/download/v{v}/T3-Code-{v}-arm64.deb",
+        ),
+    ),
 }
 
 
@@ -282,7 +309,18 @@ def check_package(
                     latest_build = str(first.get("execution_id", ""))
                     source_label = "Live Cloud Run Auto-Updater API"
             elif pkg.source_type == "github_api":
-                if isinstance(data, dict):
+                if isinstance(data, list):
+                    semver_tags: list[str] = []
+                    for r in data:
+                        if r.get("prerelease") or r.get("draft"):
+                            continue
+                        tag = str(r.get("tag_name", "")).lstrip("v")
+                        if re.match(r"^[0-9]+(\.[0-9]+)+$", tag):
+                            semver_tags.append(tag)
+                    if semver_tags:
+                        latest_ver = str(max(semver_tags, key=parse_version))
+                        source_label = "GitHub Releases API"
+                elif isinstance(data, dict):
                     tag = str(data.get("tag_name", "")).lstrip("v")
                     if tag:
                         latest_ver = tag
