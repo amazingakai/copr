@@ -1,5 +1,5 @@
 Name:           orca-ide
-Version:        1.4.271
+Version:        1.4.272
 Release:        1%{?dist}
 Summary:        Next-gen IDE for parallel agentic development
 
@@ -103,6 +103,9 @@ appstream-util validate-relax --nonet %{buildroot}%{_datadir}/metainfo/orca-ide.
 %{_datadir}/icons/hicolor/*/apps/orca-ide.png
 
 %changelog
+* Mon Nov 23 2026 Azhar Momin <azhar-momin@outlook.com> - 1.4.272-1
+- Upstream release update to 1.4.272
+
 * Mon Nov 23 2026 Azhar Momin <azhar-momin@outlook.com> - 1.4.271-1
 - Upstream release update to 1.4.271
 
