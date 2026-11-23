@@ -1,5 +1,5 @@
 Name:           opencode
-Version:        2.4.0
+Version:        2.4.1
 Release:        1%{?dist}
 Summary:        OpenCode - Open-source AI coding agent for your terminal
 
@@ -55,6 +55,9 @@ HOME=%{_tmppath} %{buildroot}%{_bindir}/opencode --version
 %{_datadir}/fish/vendor_completions.d/opencode.fish
 
 %changelog
+* Mon Nov 23 2026 Azhar Momin <azhar-momin@outlook.com> - 2.4.1-1
+- Upstream release update to 2.4.1
+
 * Mon Nov 23 2026 Azhar Momin <azhar-momin@outlook.com> - 2.4.0-1
 - Upstream release update to 2.4.0
 
