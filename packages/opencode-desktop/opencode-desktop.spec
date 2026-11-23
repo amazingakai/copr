@@ -1,5 +1,5 @@
 Name:           opencode-desktop
-Version:        2.3.2
+Version:        2.4.0
 Release:        1%{?dist}
 Summary:        OpenCode Desktop - Graphical interface for the OpenCode AI coding agent
 
@@ -85,6 +85,9 @@ test -L %{buildroot}%{_bindir}/opencode-desktop
 %{_datadir}/icons/hicolor/*/apps/ai.opencode.png
 
 %changelog
+* Mon Nov 23 2026 Azhar Momin <azhar-momin@outlook.com> - 2.4.0-1
+- Upstream release update to 2.4.0
+
 * Sun Nov 22 2026 Azhar Momin <azhar-momin@outlook.com> - 2.3.2-1
 - Initial Fedora RPM packaging for OpenCode Desktop 2.3.2
 - Graphical desktop interface for OpenCode with x86_64 and aarch64 support
