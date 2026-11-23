@@ -1,5 +1,5 @@
 Name:           opencode
-Version:        2.3.2
+Version:        2.4.0
 Release:        1%{?dist}
 Summary:        OpenCode - Open-source AI coding agent for your terminal
 
@@ -55,6 +55,9 @@ HOME=%{_tmppath} %{buildroot}%{_bindir}/opencode --version
 %{_datadir}/fish/vendor_completions.d/opencode.fish
 
 %changelog
+* Mon Nov 23 2026 Azhar Momin <azhar-momin@outlook.com> - 2.4.0-1
+- Upstream release update to 2.4.0
+
 * Sun Nov 22 2026 Azhar Momin <azhar-momin@outlook.com> - 2.3.2-1
 - Initial Fedora RPM packaging for OpenCode CLI 2.3.2
 - Standalone native binary with x86_64 and aarch64 support
