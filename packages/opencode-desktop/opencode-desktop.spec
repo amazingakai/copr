@@ -1,5 +1,5 @@
 Name:           opencode-desktop
-Version:        2.4.0
+Version:        2.4.1
 Release:        1%{?dist}
 Summary:        OpenCode Desktop - Graphical interface for the OpenCode AI coding agent
 
@@ -85,6 +85,9 @@ test -L %{buildroot}%{_bindir}/opencode-desktop
 %{_datadir}/icons/hicolor/*/apps/ai.opencode.png
 
 %changelog
+* Mon Nov 23 2026 Azhar Momin <azhar-momin@outlook.com> - 2.4.1-1
+- Upstream release update to 2.4.1
+
 * Mon Nov 23 2026 Azhar Momin <azhar-momin@outlook.com> - 2.4.0-1
 - Upstream release update to 2.4.0
 
