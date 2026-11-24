@@ -86,7 +86,7 @@ def patch_asar(asar_path: str) -> None:
         print(f"Already patched: titleBarOverlay is already disabled in {asar_path}")
         return
 
-    pattern = rb"(        titleBarOverlay:\s*isMacOS\(\)\s*\?\s*false\s*:\s*\{[^}]+\},)"
+    pattern = rb"(        titleBarOverlay:\s*isMacOS\(\)[\s\w|]*\?\s*false\s*:\s*\{[^}]+\},)"
     matches = list(re.finditer(pattern, utils_bytes))
 
     if not matches:
