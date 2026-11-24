@@ -144,6 +144,24 @@ PACKAGES: dict[str, PackageDefinition] = {
             f"https://github.com/pingdotgg/t3code/releases/download/v{v}/T3-Code-{v}-arm64.deb",
         ),
     ),
+    "zed": PackageDefinition(
+        name="zed",
+        source_type="github_api",
+        api_url="https://api.github.com/repos/zed-industries/zed/releases/latest",
+        build_urls=lambda v, _: (
+            f"https://github.com/zed-industries/zed/releases/download/v{v}/zed-linux-x86_64.tar.gz",
+            f"https://github.com/zed-industries/zed/releases/download/v{v}/zed-linux-aarch64.tar.gz",
+        ),
+    ),
+    "delta": PackageDefinition(
+        name="delta",
+        source_type="delta_api",
+        api_url="https://delta.dev/api/releases/stable/latest/asset?asset=delta&os=linux&arch=x86_64",
+        build_urls=lambda v, _: (
+            f"https://releases.delta.dev/releases/stable/{v}/delta-linux-x86_64.tar.gz",
+            f"https://releases.delta.dev/releases/stable/{v}/delta-linux-aarch64.tar.gz",
+        ),
+    ),
 }
 
 
@@ -300,6 +318,11 @@ def check_package(
             if versions:
                 latest_ver = max(versions, key=parse_version)
                 source_label = "Anthropic Claude Desktop APT Feed"
+        elif pkg.source_type == "delta_api":
+            data = fetch_json(pkg.api_url)
+            if isinstance(data, dict) and "version" in data:
+                latest_ver = str(data["version"])
+                source_label = "Delta Release API"
         else:
             data = fetch_json(pkg.api_url)
             if pkg.source_type == "updater_api":

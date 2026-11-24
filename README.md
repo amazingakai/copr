@@ -56,6 +56,12 @@ sudo dnf install -y opencode-desktop
 
 # T3 Code
 sudo dnf install -y t3code
+
+# Zed Editor
+sudo dnf install -y zed
+
+# Delta
+sudo dnf install -y delta
 ```
 
 ---
@@ -75,9 +81,11 @@ sudo dnf install -y t3code
 | **`opencode`**         | `opencode`         | `2.4.1-1`      | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/opencode/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/opencode/)             | Open-source AI Coding Agent for Terminal  |
 | **`opencode-desktop`** | `opencode-desktop` | `2.4.1-1`      | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/opencode-desktop/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/opencode-desktop/) | OpenCode Desktop GUI Application          |
 | **`t3code`**           | `t3code`           | `0.1.11-1`     | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/t3code/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/t3code/)                 | Open-source Control Plane for AI Agents   |
+| **`zed`**              | `zed`              | `1.29.3-1`     | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/zed/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/zed/)                       | High-performance, Multiplayer Code Editor |
+| **`delta`**            | `delta`            | `0.28.4-1`     | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/delta/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/delta/)                   | AI-native Collaborative Code Editor       |
 
 ---
 
 ## License
 
-This packaging repository and automation scripts are licensed under the [MIT License](LICENSE). Google Antigravity, Antigravity IDE, `agy`, Slack, Zoom, Claude Desktop, Claude Code, Orca, OpenCode, and T3 Code binaries are subject to their respective terms of service and software licenses.
+This packaging repository and automation scripts are licensed under the [MIT License](LICENSE). Google Antigravity, Antigravity IDE, `agy`, Slack, Zoom, Claude Desktop, Claude Code, Orca, OpenCode, T3 Code, Zed, and Delta binaries are subject to their respective terms of service and software licenses.
