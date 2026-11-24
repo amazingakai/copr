@@ -27,26 +27,23 @@ sudo dnf copr enable amazingakai/copr
 # Antigravity Desktop Client
 sudo dnf install -y antigravity
 
-# Antigravity Standalone IDE
-sudo dnf install -y antigravity-ide
-
 # Antigravity CLI
 sudo dnf install -y antigravity-cli
 
-# Slack Desktop Client
-sudo dnf install -y slack
-
-# Zoom Workplace
-sudo dnf install -y zoom
-
-# Claude Desktop
-sudo dnf install -y claude-desktop
+# Antigravity Standalone IDE
+sudo dnf install -y antigravity-ide
 
 # Claude Code CLI
 sudo dnf install -y claude-code
 
-# Orca IDE
-sudo dnf install -y orca-ide
+# Claude Desktop
+sudo dnf install -y claude-desktop
+
+# Delta
+sudo dnf install -y delta
+
+# GitDesktop
+sudo dnf install -y git-desktop
 
 # OpenCode CLI
 sudo dnf install -y opencode
@@ -54,14 +51,20 @@ sudo dnf install -y opencode
 # OpenCode Desktop
 sudo dnf install -y opencode-desktop
 
+# Orca IDE
+sudo dnf install -y orca-ide
+
+# Slack Desktop Client
+sudo dnf install -y slack
+
 # T3 Code
 sudo dnf install -y t3code
 
 # Zed Editor
 sudo dnf install -y zed
 
-# Delta
-sudo dnf install -y delta
+# Zoom Workplace
+sudo dnf install -y zoom
 ```
 
 ---
@@ -71,21 +74,22 @@ sudo dnf install -y delta
 | Package                | Command            | Version        | Build Status                                                                                                                                                                                                         | Description                               |
 | :--------------------- | :----------------- | :------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :---------------------------------------- |
 | **`antigravity`**      | `antigravity`      | `2.35.0-1`     | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/antigravity/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/antigravity/)           | Google Antigravity Desktop Client         |
-| **`antigravity-ide`**  | `antigravity-ide`  | `2.8.0-1`      | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/antigravity-ide/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/antigravity-ide/)   | Google Antigravity Standalone IDE         |
 | **`antigravity-cli`**  | `agy`              | `1.5.16-1`     | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/antigravity-cli/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/antigravity-cli/)   | Google Antigravity CLI terminal interface |
-| **`slack`**            | `slack`            | `4.53.287-1`   | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/slack/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/slack/)                       | Slack Desktop Client                      |
-| **`zoom`**             | `zoom`             | `7.2.5.6661-1` | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/zoom/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/zoom/)                         | Zoom Workplace Video Conferencing         |
-| **`claude-desktop`**   | `claude-desktop`   | `6.28899.6-1`  | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/claude-desktop/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/claude-desktop/)   | Claude Desktop Application & Code Agent   |
-| **`claude-code`**      | `claude`           | `2.1.331-1`    | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/claude-code/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/claude-code/)         | Claude Code Terminal Agent CLI            |
-| **`orca-ide`**         | `orca-ide`         | `1.4.273-1`    | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/orca-ide/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/orca-ide/)             | Next-gen IDE for Parallel Agentic Dev     |
-| **`opencode`**         | `opencode`         | `2.4.1-1`      | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/opencode/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/opencode/)             | Open-source AI Coding Agent for Terminal  |
+| **`antigravity-ide`**  | `antigravity-ide`  | `2.8.0-1`      | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/antigravity-ide/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/antigravity-ide/)   | Google Antigravity Standalone IDE         |
+| **`claude-code`**      | `claude`           | `2.1.331-1`    | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/claude-code/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/claude-code/)           | Claude Code Terminal Agent CLI            |
+| **`claude-desktop`**   | `claude-desktop`   | `6.28899.6-1`  | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/claude-desktop/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/claude-desktop/)     | Claude Desktop Application & Code Agent   |
+| **`delta`**            | `delta`            | `0.28.4-1`     | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/delta/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/delta/)                       | AI-native Collaborative Code Editor       |
+| **`git-desktop`**      | `gitdesktop`       | `0.16.0-1`     | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/git-desktop/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/git-desktop/)           | AI-native Desktop Git Client              |
+| **`opencode`**         | `opencode`         | `2.4.1-1`      | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/opencode/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/opencode/)                 | Open-source AI Coding Agent for Terminal  |
 | **`opencode-desktop`** | `opencode-desktop` | `2.4.1-1`      | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/opencode-desktop/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/opencode-desktop/) | OpenCode Desktop GUI Application          |
-| **`t3code`**           | `t3code`           | `0.1.11-1`     | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/t3code/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/t3code/)                 | Open-source Control Plane for AI Agents   |
-| **`zed`**              | `zed`              | `1.29.3-1`     | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/zed/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/zed/)                       | High-performance, Multiplayer Code Editor |
-| **`delta`**            | `delta`            | `0.28.4-1`     | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/delta/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/delta/)                   | AI-native Collaborative Code Editor       |
+| **`orca-ide`**         | `orca-ide`         | `1.4.273-1`    | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/orca-ide/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/orca-ide/)                 | Next-gen IDE for Parallel Agentic Dev     |
+| **`slack`**            | `slack`            | `4.53.287-1`   | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/slack/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/slack/)                       | Slack Desktop Client                      |
+| **`t3code`**           | `t3code`           | `0.1.11-1`     | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/t3code/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/t3code/)                     | Open-source Control Plane for AI Agents   |
+| **`zed`**              | `zed`              | `1.29.3-1`     | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/zed/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/zed/)                           | High-performance, Multiplayer Code Editor |
+| **`zoom`**             | `zoom`             | `7.2.5.6661-1` | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/zoom/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/zoom/)                         | Zoom Workplace Video Conferencing         |
 
 ---
 
 ## License
 
-This packaging repository and automation scripts are licensed under the [MIT License](LICENSE). Google Antigravity, Antigravity IDE, `agy`, Slack, Zoom, Claude Desktop, Claude Code, Orca, OpenCode, T3 Code, Zed, and Delta binaries are subject to their respective terms of service and software licenses.
+This packaging repository and automation scripts are licensed under the [MIT License](LICENSE). Google Antigravity, Antigravity IDE, `agy`, Slack, Zoom, Claude Desktop, Claude Code, Orca, OpenCode, T3 Code, Zed, Delta, and GitDesktop binaries are subject to their respective terms of service and software licenses.
