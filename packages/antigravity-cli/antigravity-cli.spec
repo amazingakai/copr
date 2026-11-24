@@ -1,5 +1,5 @@
 Name:           antigravity-cli
-Version:        1.5.15
+Version:        1.5.16
 Release:        1%{?dist}
 Summary:        Command-line interface for Google Antigravity
 
@@ -61,6 +61,9 @@ ln -sf agy %{buildroot}%{_bindir}/antigravity-cli
 %{_libexecdir}/antigravity-cli/agy
 
 %changelog
+* Tue Nov 24 2026 Azhar Momin <azhar-momin@outlook.com> - 1.5.16-1
+- Upstream release update to 1.5.16
+
 * Mon Nov 23 2026 Azhar Momin <azhar-momin@outlook.com> - 1.5.15-1
 - Upstream release update to 1.5.15
 
