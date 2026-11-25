@@ -1,5 +1,5 @@
 Name:           zed
-Version:        1.29.3
+Version:        1.30.2
 Release:        1%{?dist}
 Summary:        High-performance, multiplayer code editor
 
@@ -76,6 +76,9 @@ test -L %{buildroot}%{_bindir}/zed
 %{_datadir}/icons/hicolor/*/apps/zed.png
 
 %changelog
+* Wed Nov 25 2026 Azhar Momin <azhar-momin@outlook.com> - 1.30.2-1
+- Upstream release update to 1.30.2
+
 * Tue Nov 24 2026 Azhar Momin <azhar-momin@outlook.com> - 1.29.3-1
 - Initial Fedora RPM packaging for Zed 1.29.3
 - Standalone native binary with x86_64 and aarch64 support
