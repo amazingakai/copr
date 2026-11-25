@@ -1,5 +1,5 @@
 Name:           delta
-Version:        0.28.4
+Version:        0.29.0
 Release:        1%{?dist}
 Summary:        AI-native collaborative code editor by Zed Industries
 
@@ -84,6 +84,9 @@ test -L %{buildroot}%{_bindir}/delta-app
 %{_datadir}/icons/hicolor/*/apps/dev.zed.Delta.png
 
 %changelog
+* Wed Nov 25 2026 Azhar Momin <azhar-momin@outlook.com> - 0.29.0-1
+- Upstream release update to 0.29.0
+
 * Tue Nov 24 2026 Azhar Momin <azhar-momin@outlook.com> - 0.28.4-1
 - Initial Fedora RPM packaging for Delta 0.28.4
 - Standalone native binary with x86_64 and aarch64 support
