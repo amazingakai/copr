@@ -1,5 +1,5 @@
 Name:           t3code
-Version:        0.1.11
+Version:        0.1.12
 Release:        1%{?dist}
 Summary:        T3 Code - Open-source control plane for coding agents
 
@@ -93,6 +93,9 @@ test -L "%{buildroot}%{_bindir}/t3code"
 %{_datadir}/icons/hicolor/*/apps/t3code.png
 
 %changelog
+* Wed Nov 25 2026 Azhar Momin <azhar-momin@outlook.com> - 0.1.12-1
+- Upstream release update to 0.1.12
+
 * Sun Nov 22 2026 Azhar Momin <azhar-momin@outlook.com> - 0.1.11-1
 - Initial Fedora RPM packaging for T3 Code 0.1.11
 - Desktop GUI control plane for coding agents with x86_64 and aarch64 support
