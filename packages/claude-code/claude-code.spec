@@ -1,5 +1,5 @@
 Name:           claude-code
-Version:        2.1.331
+Version:        2.1.332
 Release:        1%{?dist}
 Summary:        Claude Code - Agentic coding assistant for your terminal
 
@@ -51,6 +51,9 @@ ln -sf claude %{buildroot}%{_bindir}/claude-code
 %{_bindir}/claude-code
 
 %changelog
+* Wed Nov 25 2026 Azhar Momin <azhar-momin@outlook.com> - 2.1.332-1
+- Upstream release update to 2.1.332
+
 * Mon Nov 23 2026 Azhar Momin <azhar-momin@outlook.com> - 2.1.331-1
 - Upstream release update to 2.1.331
 
