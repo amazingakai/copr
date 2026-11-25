@@ -162,15 +162,6 @@ PACKAGES: dict[str, PackageDefinition] = {
             f"https://releases.delta.dev/releases/stable/{v}/delta-linux-aarch64.tar.gz",
         ),
     ),
-    "git-desktop": PackageDefinition(
-        name="git-desktop",
-        source_type="github_api",
-        api_url="https://api.github.com/repos/theBGuy/GitDesktop/releases/latest",
-        build_urls=lambda v, _: (
-            f"https://github.com/theBGuy/GitDesktop/releases/download/v{v}/GitDesktop-{v}-1.x86_64.rpm",
-            "N/A",
-        ),
-    ),
 }
 
 
