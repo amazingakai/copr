@@ -1,6 +1,6 @@
 Name:           antigravity-ide
-Version:        2.8.0
-%global build_id 6733682917113856
+Version:        2.9.0
+%global build_id 4671306730438656
 Release:        1%{?dist}
 Summary:        Google Antigravity Standalone IDE
 
@@ -109,6 +109,9 @@ appstream-util validate-relax --nonet %{buildroot}%{_datadir}/metainfo/antigravi
 %{_datadir}/zsh/site-functions/_antigravity-ide
 
 %changelog
+* Wed Nov 25 2026 Azhar Momin <azhar-momin@outlook.com> - 2.9.0-1
+- Upstream release update to 2.9.0
+
 * Fri Nov 20 2026 Azhar Momin <azhar-momin@outlook.com> - 2.8.0-1
 - Upstream release update to 2.8.0
 
