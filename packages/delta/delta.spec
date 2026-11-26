@@ -1,5 +1,5 @@
 Name:           delta
-Version:        0.29.0
+Version:        0.29.1
 Release:        1%{?dist}
 Summary:        AI-native collaborative code editor by Zed Industries
 
@@ -84,6 +84,9 @@ test -L %{buildroot}%{_bindir}/delta-app
 %{_datadir}/icons/hicolor/*/apps/dev.zed.Delta.png
 
 %changelog
+* Thu Nov 26 2026 Azhar Momin <azhar-momin@outlook.com> - 0.29.1-1
+- Upstream release update to 0.29.1
+
 * Wed Nov 25 2026 Azhar Momin <azhar-momin@outlook.com> - 0.29.0-1
 - Upstream release update to 0.29.0
 
