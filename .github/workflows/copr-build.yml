@@ -14,20 +14,10 @@ on:
   workflow_dispatch:
     inputs:
       package:
-        description: "Package to build"
+        description: "Package to build (or 'all')"
         required: true
         default: "all"
-        type: choice
-        options:
-          - all
-          - antigravity
-          - antigravity-ide
-          - antigravity-cli
-          - slack
-          - zoom
-          - claude-desktop
-          - claude-code
-          - orca-ide
+        type: string
 
 jobs:
   determine-packages:
