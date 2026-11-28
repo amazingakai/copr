@@ -42,6 +42,9 @@ sudo dnf install -y claude-desktop
 # Delta
 sudo dnf install -y delta
 
+# Herdr
+sudo dnf install -y herdr
+
 # OpenCode CLI
 sudo dnf install -y opencode
 
@@ -53,9 +56,6 @@ sudo dnf install -y orca-ide
 
 # Slack Desktop Client
 sudo dnf install -y slack
-
-# T3 Code
-sudo dnf install -y t3code
 
 # Zed Editor
 sudo dnf install -y zed
@@ -76,11 +76,11 @@ sudo dnf install -y zoom
 | **`claude-code`**      | `claude`           | `2.1.332-1`    | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/claude-code/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/claude-code/)           | Claude Code Terminal Agent CLI            |
 | **`claude-desktop`**   | `claude-desktop`   | `6.28899.6-1`  | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/claude-desktop/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/claude-desktop/)     | Claude Desktop Application & Code Agent   |
 | **`delta`**            | `delta`            | `0.29.1-1`     | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/delta/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/delta/)                       | AI-native Collaborative Code Editor       |
+| **`herdr`**            | `herdr`            | `0.9.5-1`      | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/herdr/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/herdr/)                       | Terminal Workspace Manager for AI Agents  |
 | **`opencode`**         | `opencode`         | `2.4.2-1`      | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/opencode/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/opencode/)                 | Open-source AI Coding Agent for Terminal  |
 | **`opencode-desktop`** | `opencode-desktop` | `2.4.2-1`      | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/opencode-desktop/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/opencode-desktop/) | OpenCode Desktop GUI Application          |
 | **`orca-ide`**         | `orca-ide`         | `1.4.280-1`    | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/orca-ide/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/orca-ide/)                 | Next-gen IDE for Parallel Agentic Dev     |
 | **`slack`**            | `slack`            | `4.53.287-1`   | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/slack/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/slack/)                       | Slack Desktop Client                      |
-| **`t3code`**           | `t3code`           | `0.1.13-1`     | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/t3code/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/t3code/)                     | Open-source Control Plane for AI Agents   |
 | **`zed`**              | `zed`              | `1.30.2-1`     | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/zed/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/zed/)                           | High-performance, Multiplayer Code Editor |
 | **`zoom`**             | `zoom`             | `7.2.5.6661-1` | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/zoom/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/zoom/)                         | Zoom Workplace Video Conferencing         |
 
@@ -88,4 +88,4 @@ sudo dnf install -y zoom
 
 ## License
 
-This packaging repository and automation scripts are licensed under the [MIT License](LICENSE). Google Antigravity, Antigravity IDE, `agy`, Slack, Zoom, Claude Desktop, Claude Code, Orca, OpenCode, T3 Code, Zed, and Delta binaries are subject to their respective terms of service and software licenses.
+This packaging repository and automation scripts are licensed under the [MIT License](LICENSE). Google Antigravity, Antigravity IDE, `agy`, Slack, Zoom, Claude Desktop, Claude Code, Orca, OpenCode, Herdr, Zed, and Delta binaries are subject to their respective terms of service and software licenses.

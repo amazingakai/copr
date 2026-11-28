@@ -135,13 +135,13 @@ PACKAGES: dict[str, PackageDefinition] = {
             f"https://github.com/anomalyco/opencode/releases/download/v{v}/opencode-desktop-linux-arm64.deb",
         ),
     ),
-    "t3code": PackageDefinition(
-        name="t3code",
+    "herdr": PackageDefinition(
+        name="herdr",
         source_type="github_api",
-        api_url="https://api.github.com/repos/pingdotgg/t3code/releases/latest",
+        api_url="https://api.github.com/repos/herdrdev/herdr/releases/latest",
         build_urls=lambda v, _: (
-            f"https://github.com/pingdotgg/t3code/releases/download/v{v}/T3-Code-{v}-amd64.deb",
-            f"https://github.com/pingdotgg/t3code/releases/download/v{v}/T3-Code-{v}-arm64.deb",
+            f"https://github.com/herdrdev/herdr/releases/download/v{v}/herdr-linux-x86_64",
+            f"https://github.com/herdrdev/herdr/releases/download/v{v}/herdr-linux-aarch64",
         ),
     ),
     "zed": PackageDefinition(
