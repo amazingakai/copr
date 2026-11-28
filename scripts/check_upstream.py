@@ -144,6 +144,15 @@ PACKAGES: dict[str, PackageDefinition] = {
             f"https://github.com/herdrdev/herdr/releases/download/v{v}/herdr-linux-aarch64",
         ),
     ),
+    "herdr-app": PackageDefinition(
+        name="herdr-app",
+        source_type="herdr_app_api",
+        api_url="https://releases.herdr.dev/app/latest.json",
+        build_urls=lambda v, _: (
+            f"https://releases.herdr.dev/app/{v}/herdr-app-linux-x86_64.tar.gz",
+            f"https://releases.herdr.dev/app/{v}/herdr-app-linux-aarch64.tar.gz",
+        ),
+    ),
     "zed": PackageDefinition(
         name="zed",
         source_type="github_api",
@@ -323,6 +332,11 @@ def check_package(
             if isinstance(data, dict) and "version" in data:
                 latest_ver = str(data["version"])
                 source_label = "Delta Release API"
+        elif pkg.source_type == "herdr_app_api":
+            data = fetch_json(pkg.api_url)
+            if isinstance(data, dict) and "version" in data:
+                latest_ver = str(data["version"])
+                source_label = "Herdr App Release API"
         else:
             data = fetch_json(pkg.api_url)
             if pkg.source_type == "updater_api":

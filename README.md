@@ -45,6 +45,9 @@ sudo dnf install -y delta
 # Herdr
 sudo dnf install -y herdr
 
+# Herdr Desktop
+sudo dnf install -y herdr-app
+
 # OpenCode CLI
 sudo dnf install -y opencode
 
@@ -77,6 +80,7 @@ sudo dnf install -y zoom
 | **`claude-desktop`**   | `claude-desktop`   | `6.28899.6-1`  | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/claude-desktop/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/claude-desktop/)     | Claude Desktop Application & Code Agent   |
 | **`delta`**            | `delta`            | `0.29.1-1`     | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/delta/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/delta/)                       | AI-native Collaborative Code Editor       |
 | **`herdr`**            | `herdr`            | `0.9.5-1`      | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/herdr/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/herdr/)                       | Terminal Workspace Manager for AI Agents  |
+| **`herdr-app`**        | `herdr-app`        | `0.1.18-1`     | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/herdr-app/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/herdr-app/)               | Desktop Workspace Manager for AI Agents   |
 | **`opencode`**         | `opencode`         | `2.4.2-1`      | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/opencode/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/opencode/)                 | Open-source AI Coding Agent for Terminal  |
 | **`opencode-desktop`** | `opencode-desktop` | `2.4.2-1`      | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/opencode-desktop/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/opencode-desktop/) | OpenCode Desktop GUI Application          |
 | **`orca-ide`**         | `orca-ide`         | `1.4.280-1`    | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/orca-ide/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/orca-ide/)                 | Next-gen IDE for Parallel Agentic Dev     |
