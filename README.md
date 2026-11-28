@@ -60,6 +60,9 @@ sudo dnf install -y orca-ide
 # Slack Desktop Client
 sudo dnf install -y slack
 
+# Starship Prompt
+sudo dnf install -y starship
+
 # Zed Editor
 sudo dnf install -y zed
 
@@ -85,6 +88,7 @@ sudo dnf install -y zoom
 | **`opencode-desktop`** | `opencode-desktop` | `2.4.2-1`      | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/opencode-desktop/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/opencode-desktop/) | OpenCode Desktop GUI Application          |
 | **`orca-ide`**         | `orca-ide`         | `1.4.280-1`    | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/orca-ide/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/orca-ide/)                 | Next-gen IDE for Parallel Agentic Dev     |
 | **`slack`**            | `slack`            | `4.53.287-1`   | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/slack/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/slack/)                       | Slack Desktop Client                      |
+| **`starship`**         | `starship`         | `1.27.0-1`     | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/starship/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/starship/)                 | Cross-shell Prompt for Astronauts         |
 | **`zed`**              | `zed`              | `1.30.2-1`     | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/zed/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/zed/)                           | High-performance, Multiplayer Code Editor |
 | **`zoom`**             | `zoom`             | `7.2.5.6661-1` | [![Build Status](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/zoom/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/amazingakai/copr/package/zoom/)                         | Zoom Workplace Video Conferencing         |
 

@@ -81,6 +81,15 @@ PACKAGES: dict[str, PackageDefinition] = {
             "N/A",
         ),
     ),
+    "starship": PackageDefinition(
+        name="starship",
+        source_type="github_api",
+        api_url="https://api.github.com/repos/starship/starship/releases/latest",
+        build_urls=lambda v, _: (
+            f"https://github.com/starship/starship/releases/download/v{v}/starship-x86_64-unknown-linux-musl.tar.gz",
+            f"https://github.com/starship/starship/releases/download/v{v}/starship-aarch64-unknown-linux-musl.tar.gz",
+        ),
+    ),
     "zoom": PackageDefinition(
         name="zoom",
         source_type="zoom_redirect",
