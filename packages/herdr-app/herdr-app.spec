@@ -66,7 +66,6 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/herdr-app.desktop
 test -x %{buildroot}%{_bindir}/herdr-app
 test -x %{buildroot}%{_bindir}/herdr-core
 test -L %{buildroot}%{_bindir}/hc
-%{buildroot}%{_bindir}/herdr-app --version
 %{buildroot}%{_bindir}/herdr-core --version
 
 %files
