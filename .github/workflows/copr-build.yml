@@ -54,19 +54,40 @@ jobs:
             BASE="${{ github.event.pull_request.base.sha }}"
             HEAD="${{ github.event.pull_request.head.sha }}"
             CHANGED=$(git diff --name-only "$BASE" "$HEAD" | grep -E '^packages/' | cut -d/ -f2 | sort -u || true)
-            if [ -z "$CHANGED" ]; then
+            EXISTING=""
+            for pkg in $CHANGED; do
+              if [ -d "packages/$pkg" ] && [ -f "packages/$pkg/$pkg.spec" ]; then
+                EXISTING="${EXISTING}${pkg}\n"
+              fi
+            done
+            if [ -z "$EXISTING" ]; then
               JSON_ARRAY="[]"
             else
-              JSON_ARRAY=$(echo "$CHANGED" | jq -R -s -c 'split("\n") | map(select(length > 0))')
+              JSON_ARRAY=$(printf "$EXISTING" | jq -R -s -c 'split("\n") | map(select(length > 0))')
             fi
             echo "packages=$JSON_ARRAY" >> "$GITHUB_OUTPUT"
           else
             CHANGED=$(git diff --name-only HEAD~1 HEAD | grep -E '^packages/' | cut -d/ -f2 | sort -u || true)
-            if [ -z "$CHANGED" ]; then
+            EXISTING=""
+            for pkg in $CHANGED; do
+              if [ -d "packages/$pkg" ] && [ -f "packages/$pkg/$pkg.spec" ]; then
+                EXISTING="${EXISTING}${pkg}\n"
+              fi
+            done
+            if [ -z "$EXISTING" ]; then
               # Fallback: check all packages if HEAD~1 is not available (e.g. initial push)
               CHANGED=$(ls packages)
+              for pkg in $CHANGED; do
+                if [ -d "packages/$pkg" ] && [ -f "packages/$pkg/$pkg.spec" ]; then
+                  EXISTING="${EXISTING}${pkg}\n"
+                fi
+              done
             fi
-            JSON_ARRAY=$(echo "$CHANGED" | jq -R -s -c 'split("\n") | map(select(length > 0))')
+            if [ -z "$EXISTING" ]; then
+              JSON_ARRAY="[]"
+            else
+              JSON_ARRAY=$(printf "$EXISTING" | jq -R -s -c 'split("\n") | map(select(length > 0))')
+            fi
             echo "packages=$JSON_ARRAY" >> "$GITHUB_OUTPUT"
           fi
 
